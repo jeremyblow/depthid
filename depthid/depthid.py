@@ -52,7 +52,7 @@ def capture(camera: cv2.VideoCapture, path: str=None, session_label: str=None,
 
     Filenames will be saved as "image.png", unless the optional session and image labels
     are included. For example, providing a session label of '2017-10-11T21:48:48.288063'
-    and an image label of '100' would result in a filename of:
+    and an image label of '80' would result in a filename of:
 
         image_2017-10-11T21:48:48.288063_80.png
 
