@@ -38,7 +38,7 @@ each movement, then reset the camera back to its original position by moving -30
     for count in range(1, 101):
         move(serial_device=serial_device, steps=3)
         capture(camera=camera, path=path, session_label="test1", image_label=str(count * 3))
-    move(sd=serial_device, steps=-300)
+    move(serial_device=serial_device, steps=-300)
 ```
 
 The `session_label` and `image_label` allow the image filenames to be saved with dynamic values. 
@@ -65,7 +65,7 @@ def example_session():
     for count in range(1, 101):
         move(serial_device=serial_device, steps=3)
         capture(camera=camera, path=path, session_label="test1", image_label=str(count * 3))
-    move(sd=serial_device, steps=-300)
+    move(serial_device=serial_device, steps=-300)
     
     # Wrap things up
     tear_down(serial_device=serial_device, camera=camera)
