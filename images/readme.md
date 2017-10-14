@@ -1,0 +1,1 @@
+This directory is an example directory to store captures images within.
