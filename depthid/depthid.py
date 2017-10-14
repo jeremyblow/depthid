@@ -1,10 +1,4 @@
-"""Integrated stepper control and image capture module.
-
-
-
-
-
-"""
+"""Integrated stepper control and image capture module."""
 import argparse
 from time import sleep
 
