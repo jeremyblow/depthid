@@ -26,7 +26,7 @@ are set up are declared via the command line, which we'll show later.
 ```python
 def example_session():
     
-    # Setup serial_device and camera for use, obtain path to save images to
+    # Setup serial_device and camera for use, obtain path to save images
     serial_device, camera, path = setup()
 ```
         
@@ -42,7 +42,7 @@ each movement, then reset the camera back to its original position by moving -30
 ```
 
 The `session_label` and `image_label` allow the image filenames to be saved with dynamic values. 
-E.g. `image_test1_80.png`.
+E.g. `image_test1_33.png`.
         
 Finally, release any locks on the devices by calling `tear_down`:
 
