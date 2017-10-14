@@ -14,67 +14,81 @@ To get started, create a Python script with your movement/image capture procedur
 we'll call the script `session_1.py`. First, inside `session_.py`, import any necessary functions
 from the depthid package:
 
-    from depthid import capture, move, setup, tear_down
+```python
+from depthid import capture, move, setup, tear_down
+```
 
 Next, create a function for your procedure. The first step in the function should be to set up
 the serial communications with the Arduino, establish a capture session with the camera, and
 finally obtain the path where we'll store these images. The parameters for how these things
 are setup are declared via the command line, which we'll show later. 
 
-    def example_session():
-        
-        # Setup serial_device and camera for use, obtain path to save images to
-        serial_device, camera, path = setup()
+```python
+def example_session():
+    
+    # Setup serial_device and camera for use, obtain path to save images to
+    serial_device, camera, path = setup()
+```
         
 Next, adding to the `example_session` function, let's move the camera and take some pictures. 
 For this one we'll move the stepper motor 3 steps forward 100 times, taking a picture after 
 each step, then reset the camera to the original position by moving it back -300 steps:
 
-        for count in range(1, 101):
-            move(serial_device=serial_device, steps=3)
-            capture(camera=camera, path=path, session_label="test1", image_label=str(count * 3))
-        move(sd=serial_device, steps=-300)
+```python
+    for count in range(1, 101):
+        move(serial_device=serial_device, steps=3)
+        capture(camera=camera, path=path, session_label="test1", image_label=str(count * 3))
+    move(sd=serial_device, steps=-300)
+```
 
 The `session_label` and `image_label` allow the image filenames to be saved with dynamic values. 
 E.g. `image_test1_80.png`.
         
 Finally, release any locks on the devices by calling `tear_down`:
 
-        tear_down(serial_device=serial_device, camera=camera)
+```python
+    tear_down(serial_device=serial_device, camera=camera)
+```
         
 Putting this all together:
 
-    from depthid import capture, move, setup, tear_down
-    
-    
-    def example_session():
-        
-        # Setup serial_device and camera for use, obtain path to save images
-        serial_device, camera, path = setup()
-        
-        # Move the camera and take pictures. Reset position when done.
-        for count in range(1, 101):
-            move(serial_device=serial_device, steps=3)
-            capture(camera=camera, path=path, session_label="test1", image_label=str(count * 3))
-        move(sd=serial_device, steps=-300)
-        
-        # Wrap things up
-        tear_down(serial_device=serial_device, camera=camera)
+```python
+from depthid import capture, move, setup, tear_down
 
 
-    if __name__ == "__main__":
+def example_session():
     
-        example_session()
+    # Setup serial_device and camera for use, obtain path to save images
+    serial_device, camera, path = setup()
+    
+    # Move the camera and take pictures. Reset position when done.
+    for count in range(1, 101):
+        move(serial_device=serial_device, steps=3)
+        capture(camera=camera, path=path, session_label="test1", image_label=str(count * 3))
+    move(sd=serial_device, steps=-300)
+    
+    # Wrap things up
+    tear_down(serial_device=serial_device, camera=camera)
+
+
+if __name__ == "__main__":
+
+    example_session()
+```
 
 
 Save this file. To execute your script, call it from the command line. Certain necessary and
 optional parameters are passed to the script when called. The syntax is: 
 
-    python script.py -t <usb tty device> [-p save_path] [-c camera_id] [-h height] [-w width] [-b baud]
+```bash
+python script.py -t <usb tty device> [-p save_path] [-c camera_id] [-h height] [-w width] [-b baud]
+```
 
 A most basic example only requires the path to the serial device to be specified:
 
-    python session_1.py -t /dev/tty.usbmodem142311
+```bash
+python session_1.py -t /dev/tty.usbmodem142311
+```
     
 If you're on a Mac or Linux, and are uncertain of the path of your USB serial device, you can 
 run `ls /dev/tty.*` to see what's available. 
@@ -82,7 +96,9 @@ run `ls /dev/tty.*` to see what's available.
 By default, all images will be saved at 640x480 resolution in a subdirectory called `images`.
 Below is a more complete example showing further customization:
 
-    python session_1.py -t /dev/tty.usbmodem142311 -p ./images_dir -c 0 -h 1024 -w 1080 -b 9600
+```bash
+python session_1.py -t /dev/tty.usbmodem142311 -p ./images_dir -c 0 -h 1024 -w 1080 -b 9600
+```
 
 A more complete usage example can be found in `example.py`. To understand what's going on
 underneath the hood, the main package functions are in `depthid/depthid.py` 
