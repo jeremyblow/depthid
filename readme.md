@@ -7,7 +7,7 @@ Integrated Arduino stepper control and OpenCV image capture package.
 In this example we will be creating a script which moves the camera 3 steps forward 100 times, 
 capturing an image after each movement. After this is complete, we will reset the camera back
 to its original position. If you intend on following along with your own equipment, please be
-sure to set your environment up as indicated in the **Setup & Requirements** section at the
+sure to first set your environment up as indicated in the **Setup & Requirements** section at the
 end of this document. 
 
 To get started, create a Python script with your movement/image capture procedure. For this example,
@@ -119,7 +119,8 @@ your Arduino.
 
 To install the Python package dependencies, it is recommended you first create a VirtualEnv. Once 
 inside your VirtualEnv. you can install the required dependencies via 
-`pip install -r requirements.txt`. Naturally, you will execute your script from inside a VirtualEnv. 
+`pip install -r requirements.txt`. Naturally, you will execute your script from inside this
+ VirtualEnv. 
 
 
 ### Cameras
