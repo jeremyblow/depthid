@@ -11,17 +11,17 @@ sure to set your environment up as indicated in the **Setup & Requirements** sec
 end of this document. 
 
 To get started, create a Python script with your movement/image capture procedure. For this example,
-we'll call the script `session_1.py`. First, inside `session_.py`, import any necessary functions
+we'll call the script `session_1.py`. First, inside `session_.1py`, import any necessary functions
 from the depthid package:
 
 ```python
 from depthid import capture, move, setup, tear_down
 ```
 
-Next, create a function for your procedure. The first step in the function should be to set up
+Next, create a function for your procedure. The first step in this function should be to set up
 the serial communications with the Arduino, establish a capture session with the camera, and
 finally obtain the path where we'll store these images. The parameters for how these things
-are setup are declared via the command line, which we'll show later. 
+are set up are declared via the command line, which we'll show later. 
 
 ```python
 def example_session():
@@ -30,9 +30,9 @@ def example_session():
     serial_device, camera, path = setup()
 ```
         
-Next, adding to the `example_session` function, let's move the camera and take some pictures. 
-For this one we'll move the stepper motor 3 steps forward 100 times, taking a picture after 
-each step, then reset the camera to the original position by moving it back -300 steps:
+Next, adding to the `example_session` function, let's move the camera and capture some images. 
+For this, we'll move the stepper motor 3 steps forward 100 times, taking a picture after 
+each movement, then reset the camera back to its original position by moving -300 steps:
 
 ```python
     for count in range(1, 101):
@@ -78,7 +78,7 @@ if __name__ == "__main__":
 
 
 Save this file. To execute your script, call it from the command line. Certain necessary and
-optional parameters are passed to the script when called. The syntax is: 
+optional parameters are passed to the script when called on the command line. The syntax is: 
 
 ```bash
 python script.py -t <usb tty device> [-p save_path] [-c camera_id] [-h height] [-w width] [-b baud]
@@ -107,7 +107,7 @@ underneath the hood, the main package functions are in `depthid/depthid.py`
 
 To use this package, you will need the following:
 
-* An Arduino microcontroller with appropriate stepper motor control
+* An Arduino compatible microcontroller with appropriate bipolar stepper motor control
 * A USB camera (see **Cameras** section below)
 * A Mac or Linux computer with:
     * OpenCV 3.3.0 or newer
@@ -124,7 +124,8 @@ inside your VirtualEnv. you can install the required dependencies via
 
 ### Cameras
 
-Below are cameras which have been or are being tested:
+Below are cameras which have been or are being tested. However, a wide number of consumer, 
+scientific, and industrial cameras will probably work just fine.
 
 * **rocksoul WK-107219SB** (a.k.a. Turbo)
     * Sensor: CMOS
