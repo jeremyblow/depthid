@@ -7,8 +7,8 @@ Integrated Arduino stepper control and OpenCV image capture package.
 In this example we will be creating a script which moves the camera 3 steps forward 100 times, 
 capturing an image after each movement. After this is complete, we will reset the camera back
 to its original position. If you intend on following along with your own equipment, please be
-sure to first set your environment up as indicated in the **Setup & Requirements** section at the
-end of this document. 
+sure to first set your environment up as indicated in the **Requirements** and **Setup** sections
+ at the end of this document. 
 
 To get started, create a Python script with your movement/image capture procedure. For this example,
 we'll call the script `session_1.py`. First, inside `session_.1py`, import any necessary functions
@@ -103,7 +103,7 @@ python session_1.py -t /dev/tty.usbmodem142311 -p ./images_dir -c 0 -h 1024 -w 1
 A more complete usage example can be found in `example.py`. To understand what's going on
 underneath the hood, the main package functions are in `depthid/depthid.py` 
     
-### Setup & Requirements
+### Requirements
 
 To use this package, you will need the following:
 
@@ -117,11 +117,72 @@ To use this package, you will need the following:
 Using the Arduino IDE, upload the included INO file found in `arduino/Turbo_the_Camera` to 
 your Arduino. 
 
-To install the Python package dependencies, it is recommended you first create a VirtualEnv. Once 
-inside your VirtualEnv. you can install the required dependencies via 
-`pip install -r requirements.txt`. Naturally, you will execute your script from inside this
- VirtualEnv. 
+See **macOS Setup** below to set up the necessary environment on macOS. 
 
+#### macOS Setup
+
+The below procedure assumes you do not already have a macOS computer setup with Xcode, OpenCV, and 
+Python 3.6.2. In order to make the installation easier, we will also install Homebrew and pyenv. 
+
+If not already installed, install Apple Xcode:
+
+1. Open App Store, search for Xcode and install. It may take some time to install.
+2. Install Apple command line tools by issuing `sudo xcode-select --install`.
+3. Accept license by issuing `sudo xcodebuild -license`.
+
+Install [Homebrew](https://brew.sh/):
+
+```bash
+/usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
+brew update
+```
+
+Install [pyenv](https://github.com/pyenv/pyenv) and dependencies:
+
+```bash
+brew install readline pyenv pyenv-virtualenv pyenv-virtualenvwrapper
+echo 'if which pyenv > /dev/null; then eval "$(pyenv init -)"; fi' >> ~/.bash_profile
+echo 'if which pyenv-virtualenv-init > /dev/null; then eval "$(pyenv virtualenv-init -)"; fi' >> ~/.bash_profile
+echo 'pyenv virtualenvwrapper' >> ~/.bash_profile
+```
+
+Install Python 3.6.2
+
+```bash
+pyenv install 3.6.2
+```
+
+Create and switch in to virtual environment (use `source deactivate` to exit virtual environment):
+
+```bash
+mkvirtualenv -p python3.6 depthid
+workon depthid
+```
+
+Install package dependencies:
+```bash
+pip install -r requirements.txt
+```
+
+Install [OpenCV](https://opencv.org/):
+
+```bash
+brew install opencv
+```
+
+Bind OpenCV to system python and virtual environment paths:
+
+```bash
+echo /usr/local/opt/opencv/lib/python3.6/site-packages >> /usr/local/lib/python3.6/site-packages/opencv.pth
+ln -s /usr/local/opt/opencv/lib/python3.6/site-packages/cv2.cpython-36m-darwin.so ~/.virtualenvs/depthid2/lib/python3.6/site-packages/cv2.so
+```
+
+To confirm your environment, launch `python` and import the `cv2` package as shown below.
+```
+>>> import cv2
+>>> cv2.__version__
+'3.3.0'
+```
 
 ### Cameras
 
