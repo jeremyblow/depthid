@@ -42,7 +42,7 @@ each movement, then reset the camera back to its original position by moving -30
 ```
 
 The `session_label` and `image_label` allow the image filenames to be saved with dynamic values. 
-E.g. `image_test1_33.png`.
+E.g. `image_test1_33.tiff`.
         
 Finally, release any locks on the devices by calling `tear_down`:
 
@@ -97,7 +97,7 @@ By default, all images will be saved at 640x480 resolution in a subdirectory cal
 Below is a more complete example showing further customization:
 
 ```bash
-python session_1.py -t /dev/tty.usbmodem142311 -p ./images_dir -c 0 -h 1024 -w 1080 -b 9600
+python session_1.py -t /dev/tty.usbmodem142311 -p ./images_dir -c 0 -h 1080 -w 1920 -b 9600
 ```
 
 A more complete usage example can be found in `example.py`. To understand what's going on

@@ -47,7 +47,7 @@ def move(serial_device: Serial, steps: int=1, verify: bool=None, step_wait: floa
 
 
 def capture(camera: cv2.VideoCapture, path: str=None, session_label: str=None,
-            image_label: str=None, display: bool=True):
+            image_label: str=None, img_format: str="tiff", display: bool=True):
     """Captures frame from camera, saves to disk with specified session and image labels.
 
     Filenames will be saved as "image.png", unless the optional session and image labels
@@ -62,15 +62,17 @@ def capture(camera: cv2.VideoCapture, path: str=None, session_label: str=None,
             within the current directory.
         session_label (str): Optional session label to include in saved image filename.
         image_label (str): Optional image label to include in saved image filename.
+        img_format (str): Image file format. Supported values are 'tiff', 'png', 'jpg'.
+            Default: 'tiff'.
         display (bool): When set to False, image will not be displayed upon capture.
             Default: True.
     """
 
-    #todo: work out format
-    filename = "{path}image{session_label}{image_label}.png".format(
+    filename = "{path}image{session_label}{image_label}.{img_format}".format(
         path=f"{path}/" if path else "",
         session_label=f"_{session_label}" if session_label else "",
-        image_label=f"_{image_label}" if image_label else ""
+        image_label=f"_{image_label}" if image_label else "",
+        img_format=img_format
     )
 
     print(f"Saving {filename}")
