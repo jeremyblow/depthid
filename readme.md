@@ -119,7 +119,7 @@ your Arduino.
 
 See **macOS Setup** below to set up the necessary environment on macOS. 
 
-#### macOS Setup
+### macOS Setup
 
 The below procedure assumes you do not already have a macOS computer setup with Xcode, OpenCV, and 
 Python 3.6.2. In order to make the installation easier, we will also install Homebrew and pyenv. 
@@ -140,7 +140,7 @@ brew update
 Install [pyenv](https://github.com/pyenv/pyenv) and dependencies:
 
 ```bash
-brew install readline pyenv pyenv-virtualenv pyenv-virtualenvwrapper
+brew install autoconf pkg-config readline pyenv pyenv-virtualenv pyenv-virtualenvwrapper
 echo 'if which pyenv > /dev/null; then eval "$(pyenv init -)"; fi' >> ~/.bash_profile
 echo 'if which pyenv-virtualenv-init > /dev/null; then eval "$(pyenv virtualenv-init -)"; fi' >> ~/.bash_profile
 echo 'pyenv virtualenvwrapper' >> ~/.bash_profile
