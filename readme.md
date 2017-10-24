@@ -4,11 +4,12 @@ Integrated Arduino stepper control and OpenCV image capture package.
 
 ### Usage Example
 
-In this example we will be creating a script which moves the camera 3 steps forward 100 times, 
-capturing an image after each movement. After this is complete, we will reset the camera back
-to its original position. If you intend on following along with your own equipment, please be
-sure to first set your environment up as indicated in the **Requirements** and **Setup** sections
- at the end of this document. 
+In this example we will be creating a script which moves the camera 1 step forward on the X axis,
+then 1 step forward on the Z axis 100 times, capturing an image after each movement. After 100 
+images have been captured, we will reset the camera back to its original Z position by moving
+back 100 steps on the Z axis once. After this, the cycle repeats 10 times. If you intend on 
+following along with your own equipment, please be sure to first set your environment up as 
+indicated in the **Requirements** and **Setup** sections at the end of this document. 
 
 To get started, create a Python script with your movement/image capture procedure. For this example,
 we'll call the script `session_1.py`. First, inside `session_.1py`, import any necessary functions
@@ -30,11 +31,17 @@ def example_session():
     serial_device, camera, path = setup()
 ```
         
-Next, adding to the `example_session` function, let's move the camera and capture some images. 
+Next, adding to the `example_session` function, let's move the camera and capture some images as
+described above. 
 For this, we'll move the stepper motor 3 steps forward 100 times, taking a picture after 
 each movement, then reset the camera back to its original position by moving -300 steps:
 
 ```python
+    x, y, z = 0, 0, 0
+    
+    for x_count in range(10):
+        
+    
     for count in range(1, 101):
         move(serial_device=serial_device, steps=3)
         capture(camera=camera, path=path, session_label="test1", image_label=str(count * 3))
@@ -152,16 +159,10 @@ Install Python 3.6.2
 pyenv install 3.6.2
 ```
 
-Create and switch in to virtual environment (use `source deactivate` to exit virtual environment):
+Create a Python 3.6.2 based  virtual environment for **depthid**:
 
 ```bash
 mkvirtualenv -p python3.6 depthid
-workon depthid
-```
-
-Install package dependencies:
-```bash
-pip install -r requirements.txt
 ```
 
 Install [OpenCV](https://opencv.org/):
@@ -183,6 +184,23 @@ To confirm your environment, launch `python` and import the `cv2` package as sho
 >>> cv2.__version__
 '3.3.0'
 ```
+
+Wonderful, you have the base requirements installed. Now to use **depthid**, you will:
+ 
+1. Clone **depthid** package from GitHub
+2. Change into the `depthid` directory
+3. Activate the virtual environment (it may already be active from a previous step, it's ok to 
+activate it more than once)
+4. Install **depthid** package requirements with pip
+ 
+```bash
+git clone https://github.com/jeremyblow/depthid.git
+cd depthid
+workon depthid
+pip install -r requirements.txt
+```
+
+From here you now can create your own scripts as described above in **Usage Example**.  
 
 ### Cameras
 
