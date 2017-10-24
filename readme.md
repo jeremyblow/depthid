@@ -4,12 +4,11 @@ Integrated Arduino stepper control and OpenCV image capture package.
 
 ### Usage Example
 
-In this example we will be creating a script which moves the camera 1 step forward on the X axis,
-then 1 step forward on the Z axis 100 times, capturing an image after each movement. After 100 
-images have been captured, we will reset the camera back to its original Z position by moving
-back 100 steps on the Z axis once. After this, the cycle repeats 10 times. If you intend on 
-following along with your own equipment, please be sure to first set your environment up as 
-indicated in the **Requirements** and **Setup** sections at the end of this document. 
+In this example we will be creating a script which moves the camera 3 steps forward 100 times, 
+capturing an image after each movement. After this is complete, we will reset the camera back
+to its original position. If you intend on following along with your own equipment, please be
+sure to first set your environment up as indicated in the **Requirements** and **Setup** sections
+ at the end of this document. 
 
 To get started, create a Python script with your movement/image capture procedure. For this example,
 we'll call the script `session_1.py`. First, inside `session_.1py`, import any necessary functions
@@ -31,17 +30,11 @@ def example_session():
     serial_device, camera, path = setup()
 ```
         
-Next, adding to the `example_session` function, let's move the camera and capture some images as
-described above. 
+Next, adding to the `example_session` function, let's move the camera and capture some images. 
 For this, we'll move the stepper motor 3 steps forward 100 times, taking a picture after 
 each movement, then reset the camera back to its original position by moving -300 steps:
 
 ```python
-    x, y, z = 0, 0, 0
-    
-    for x_count in range(10):
-        
-    
     for count in range(1, 101):
         move(serial_device=serial_device, steps=3)
         capture(camera=camera, path=path, session_label="test1", image_label=str(count * 3))
