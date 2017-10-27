@@ -84,14 +84,15 @@ optional parameters are passed to the script when called on the command line. Th
 python script.py -t <usb tty device> [-p save_path] [-c camera_id] [-h height] [-w width] [-b baud]
 ```
 
-A most basic example only requires the path to the serial device to be specified:
+A most basic example only requires the path to the serial device to be specified. (**Note: The path
+to your serial device will be different**. If you're on a Mac or Linux, and are uncertain of the path of your USB serial device, you can 
+run `ls /dev/tty.*` to see what's available):
 
 ```bash
 python session_1.py -t /dev/tty.usbmodem142311
 ```
     
-If you're on a Mac or Linux, and are uncertain of the path of your USB serial device, you can 
-run `ls /dev/tty.*` to see what's available. 
+
 
 By default, all images will be saved at 640x480 resolution in a subdirectory called `images`.
 Below is a more complete example showing further customization:
@@ -119,25 +120,45 @@ your Arduino.
 
 See **macOS Setup** below to set up the necessary environment on macOS. 
 
-### macOS Setup
+## macOS Setup
 
-The below procedure assumes you do not already have a macOS computer setup with Xcode, OpenCV, and 
-Python 3.6.2. In order to make the installation easier, we will also install Homebrew and pyenv. 
+The below setup procedures assume you already have Xcode command line tools installed. If not, 
+execute:
 
-If not already installed, install Apple Xcode:
+    sudo xcode-select --install
+    
+From here, you can follow either the **Anaconda/conda** or **Homebrew/pyenv** steps, as appropriate
+for your environment. 
 
-1. Open App Store, search for Xcode and install. It may take some time to install.
-2. Install Apple command line tools by issuing `sudo xcode-select --install`.
-3. Accept license by issuing `sudo xcodebuild -license`.
+### Anaconda/conda
 
-Install [Homebrew](https://brew.sh/):
+The following procedure assumes a working [Anaconda](https://www.anaconda.com/download/#macos) 
+installation is already set up on your system. 
 
-```bash
-/usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
-brew update
-```
+Create and change into a directory for your project(s), e.g.:
 
-Install [pyenv](https://github.com/pyenv/pyenv) and dependencies:
+    mkdir -p ~/Documents/Projects
+    cd ~/Documents/Projects
+
+Clone the **depthid** repo:
+
+    git clone https://github.com/jeremyblow/depthid.git
+    cd depthid
+   
+Create and activate an environment with the necessary packages 
+(Python 3.6.2, OpenCV 3.3.0, pyserial):
+
+    conda env create
+    source activate depthid
+
+From here you now can create your own scripts as described above in **Usage Example**.  
+
+### Homebrew/pyenv
+
+The below procedure assumes a working [Homebrew](https://brew.sh/) installation is already set up on
+your system. 
+
+Install [pyenv](https://github.com/pyenv/pyenv), if not already installed:
 
 ```bash
 brew install autoconf pkg-config readline pyenv pyenv-virtualenv pyenv-virtualenvwrapper
@@ -146,28 +167,16 @@ echo 'if which pyenv-virtualenv-init > /dev/null; then eval "$(pyenv virtualenv-
 echo 'pyenv virtualenvwrapper' >> ~/.bash_profile
 ```
 
-Install Python 3.6.2
-
+Install Python 3.6.2 and create a Python 3.6.2 based  virtual environment for **depthid**:
 ```bash
 pyenv install 3.6.2
-```
-
-Create a Python 3.6.2 based  virtual environment for **depthid**:
-
-```bash
 mkvirtualenv -p python3.6 depthid
 ```
 
-Install [OpenCV](https://opencv.org/):
+Install [OpenCV](https://opencv.org/) and bind it to the virtual environment:
 
 ```bash
 brew install opencv
-```
-
-Bind OpenCV to system python and virtual environment paths:
-
-```bash
-echo /usr/local/opt/opencv/lib/python3.6/site-packages >> /usr/local/lib/python3.6/site-packages/opencv.pth
 ln -s /usr/local/opt/opencv/lib/python3.6/site-packages/cv2.cpython-36m-darwin.so ~/.virtualenvs/depthid/lib/python3.6/site-packages/cv2.so
 ```
 
@@ -179,7 +188,7 @@ To confirm your environment, launch `python` and import the `cv2` package as sho
 ```
 
 Wonderful, you have the base requirements installed. Now to use **depthid**, you will:
- 
+
 1. Clone **depthid** package from GitHub
 2. Change into the `depthid` directory
 3. Activate the virtual environment (it may already be active from a previous step, it's ok to 
