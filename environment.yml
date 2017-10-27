@@ -1,0 +1,4 @@
+name: depthid
+dependencies:
+- python=3.6.2
+- pyserial=3.4
