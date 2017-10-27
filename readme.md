@@ -11,8 +11,8 @@ sure to first set your environment up as indicated in the **Requirements** and *
  at the end of this document. 
 
 To get started, create a Python script with your movement/image capture procedure. For this example,
-we'll call the script `session_1.py`. First, inside `session_.1py`, import any necessary functions
-from the depthid package:
+we'll call the script `session_1.py`. First, inside `session_1.py`, import any necessary functions
+from the **depthid** package:
 
 ```python
 from depthid import capture, move, setup, tear_down
