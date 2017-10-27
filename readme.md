@@ -168,7 +168,7 @@ Bind OpenCV to system python and virtual environment paths:
 
 ```bash
 echo /usr/local/opt/opencv/lib/python3.6/site-packages >> /usr/local/lib/python3.6/site-packages/opencv.pth
-ln -s /usr/local/opt/opencv/lib/python3.6/site-packages/cv2.cpython-36m-darwin.so ~/.virtualenvs/depthid2/lib/python3.6/site-packages/cv2.so
+ln -s /usr/local/opt/opencv/lib/python3.6/site-packages/cv2.cpython-36m-darwin.so ~/.virtualenvs/depthid/lib/python3.6/site-packages/cv2.so
 ```
 
 To confirm your environment, launch `python` and import the `cv2` package as shown below.
