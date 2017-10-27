@@ -1,6 +1,6 @@
 # Depth ID
 
-Integrated Arduino stepper control and OpenCV image capture package.
+Integrated OpenCV image capture and Arduino stepper control.
 
 ### Usage Example
 
