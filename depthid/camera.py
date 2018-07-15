@@ -24,6 +24,7 @@ class Camera:
         self.camera = cv2.VideoCapture(self.camera_index)
         self.camera.set(cv2.CAP_PROP_FRAME_HEIGHT, self.height)
         self.camera.set(cv2.CAP_PROP_FRAME_WIDTH, self.width)
+        print("Initialized camera")
         return self.camera
 
     def capture(self):

@@ -54,12 +54,13 @@ class Job:
             os.makedirs(self.image_directory)
         except OSError as e:
             if e.errno != errno.EEXIST:
-                raise
+                raise RuntimeError(f"Unable to create image directory {self.image_directory}: {e}")
 
     def run(self):
         self.controller.initialize()
         self.camera.initialize()
         self.save_parameters()
+        print("Job commencing")
 
         for idx, waypoint in enumerate(self.sequence):
             command = self.controller.move(waypoint)
@@ -80,7 +81,7 @@ class Job:
             sleep(self.wait_after)
 
             self.step_count += 1
-            print(f"{self.status()}, {[p for _, p in waypoint]}")
+            print(f"{self.status()}, {command}")
 
     def save_parameters(self):
         with open(f"{self.image_directory}/parameters.json", "w") as fh:

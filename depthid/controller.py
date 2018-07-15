@@ -40,6 +40,7 @@ class Controller:
 
         self.send("G0")
         self.wait_for("ok")
+        print("Initialized controller")
         return self.serial
 
     def send(self, message, send_linefeed=True):
@@ -68,7 +69,7 @@ class Controller:
         self.send(message)
         self.wait_for("ok")
         self.update_positions()
-        while not self.positions.items() <=  dict(waypoint).items():
+        while not dict(waypoint).items() <= self.positions.items():
             # Prevent flooding controller
             sleep(.08)
             self.update_positions()

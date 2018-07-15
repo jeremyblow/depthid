@@ -51,7 +51,7 @@ Note: the second parameter for each motor is the motor's microstep.
 Jobs are also specified in JSON. Several job examples can be found within the `examples/`
 directory:
 
-* `job_coordinates.json` - Demonstrates specifying coordinate sequences directly within job file.
+* `job_inline.json` - Demonstrates specifying coordinate sequences directly within job file.
 * `job_csv.json` - Demonstrates loading an external CSV file containing coordinates.
 * `job_generate.json` - Demonstrates parameter-driven coordinate generation. Further 
     information is available under the **Job Format** section. 
@@ -63,13 +63,13 @@ prior to execution. Usage example:
 
 Progress will displayed on the terminal::
 
-    2.22%, Waypoint 1/45, Time 0:00:02.691880/0:07:33.944381, [0, 0, 0]
-    4.44%, Waypoint 2/45, Time 0:00:09.404582/0:07:31.985596, [0, 0, 200]
-    6.67%, Waypoint 3/45, Time 0:00:16.103426/0:07:30.993264, [0, 0, 400]
-    8.89%, Waypoint 4/45, Time 0:00:22.799437/0:07:30.301831, [0, 0, 600]
-    11.11%, Waypoint 5/45, Time 0:00:29.427541/0:07:29.486895, [0, 0, 800]
-    13.33%, Waypoint 6/45, Time 0:00:55.826761/0:07:29.565381, [0, 200, 0]
-    15.56%, Waypoint 7/45, Time 0:01:02.532876/0:07:29.521698, [0, 200, 200]
+    2.22%, Waypoint 1/45, Time 0:00:02.691880/0:07:33.944381, X0 Y0 Z0]
+    4.44%, Waypoint 2/45, Time 0:00:09.404582/0:07:31.985596, X0 Y0 Z200]
+    6.67%, Waypoint 3/45, Time 0:00:16.103426/0:07:30.993264, X0 Y0 Z400]
+    8.89%, Waypoint 4/45, Time 0:00:22.799437/0:07:30.301831, X0 Y0 Z600]
+    11.11%, Waypoint 5/45, Time 0:00:29.427541/0:07:29.486895, X0 Y0 Z800]
+    13.33%, Waypoint 6/45, Time 0:00:55.826761/0:07:29.565381, X0 Y200 Z0]
+    15.56%, Waypoint 7/45, Time 0:01:02.532876/0:07:29.521698, X0 Y200 Z200]
     ...
     
 ### Job Format
@@ -116,7 +116,8 @@ CSV and inline coordinates are in the format:
     x_pos,y_pos,z_pos
     x_pos,y_pos,z_pos
     
-If only moving on a single axis, you may exclude other axes, e.g. `,,1`. 
+If only moving on a single axis, you may exclude other axes, e.g. `,,1` for CSV and `null,null,1`
+for inline coordinates. 
 
 ### Safety
 

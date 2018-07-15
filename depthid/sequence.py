@@ -33,6 +33,7 @@ class Sequence:
         sequence = cls()
         for coordinate in coordinates:
             sequence.add(coordinate)
+        print(f"Initialized {len(sequence)} waypoints")
         return sequence
 
     @classmethod
@@ -57,12 +58,14 @@ class Sequence:
             r'(?P<axis>[{}])\((?P<start>[\d-]+),(?P<stop>[\d-]+),(?P<step>[\d-]+)\),?'.format(''.join(cls.axes))
         )
         dimensions = [m.groupdict() for m in p.finditer(parameters)]
-        return cls(
+        sequence = cls(
             waypoints=[x for x in do_axis(dimensions, **dimensions[0])]
         )
+        print(f"Initialized {len(sequence)} waypoints")
+        return sequence
 
     def add(self, coordinate):
-        waypoint = [(self.axes[idx], int(position)) for idx, position in enumerate(coordinate)]
+        waypoint = [(self.axes[idx], int(p)) for idx, p in enumerate(coordinate) if p not in (None, '')]
         self.waypoints.append(waypoint)
         return waypoint
 

@@ -1,0 +1,9 @@
+{
+  "name": "session_1",
+  "path": "images/",
+  "image_format": "tiff",
+  "display": true,
+  "wait_before": 0.0,
+  "wait_after": 0.0,
+  "csv_filename": "examples/coordinates_2.csv"
+}
