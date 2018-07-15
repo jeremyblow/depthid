@@ -1,0 +1,9 @@
+{
+  "name": "session_1",
+  "path": "images/",
+  "image_format": "tiff",
+  "display": true,
+  "wait_before": 0.0,
+  "wait_after": 0.0,
+  "sequence_parameters": "x(0,4,1),y(0,4,1),z(0,4,1)"
+}

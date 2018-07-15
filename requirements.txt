@@ -8,7 +8,7 @@ jedi==0.11.0
 jsonpointer==1.12
 matplotlib==2.1.0
 networkx==2.0
-numpy==1.13.3
+numpy==1.14.5
 olefile==0.44
 parso==0.1.0
 pexpect==4.2.1
