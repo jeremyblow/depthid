@@ -1,0 +1,16 @@
+{
+  "controller": {
+    "device_name": "/dev/cu.usbmodem211",
+    "baud_rate": 115200,
+    "motors": [
+      ["x", 1.00],
+      ["y", 1.00],
+      ["z", 1.00]
+    ]
+  },
+  "camera": {
+    "camera_index": 0,
+    "height": 480,
+    "width": 640
+  }
+}
