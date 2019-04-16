@@ -49,20 +49,6 @@ def get_key():
         return chr(n)
 
 
-
-    try:
-        n = ord(getch())
-        print(n)
-        return key_map[n]
-    except KeyError:
-        try:
-            n = ord(getch())
-            print(n)
-            return key_map[n]
-        except KeyError:
-            return
-
-
 def log_dict(d, banner=None):
     max_key = max([len(k) for k in d]) + 1
     if banner:
