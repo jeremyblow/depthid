@@ -1,0 +1,28 @@
+{
+  "controller": {
+    "device_name": "COM3",
+    "baud_rate": 115200,
+    "motors": [
+      ["x", 1.00],
+      ["y", 0.50],
+      ["z", 1.00]
+    ]
+  },
+  "camera": {
+    "interface": "spinnaker",
+    "camera_index": 0,
+    "height": 1920,
+    "width": 1200,
+    "pixel_format": "Mono 16",
+    "display_format": "Mono 16",
+    "save_formats": ["raw", "tiff"],
+    "exposure_us": 19431,
+    "gain_db": 0
+  },
+  "job": {
+    "name": "interactive_session",
+    "path": "data/",
+    "mode": "interactive",
+    "wait_after": 0.1
+  }
+}
