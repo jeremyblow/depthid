@@ -1,25 +1,48 @@
 import argparse
+import logging
 from typing import TextIO
 
-from depthid.job import Job
-from depthid.camera import Camera
-from depthid.config import load_config
+from depthid.job import Job, JobException
+from depthid.camera import load_camera
 from depthid.controller import Controller
+from depthid.util import load_config
 
 
-def main(config_fh: TextIO, job_fh: TextIO):
+logging.basicConfig(format="%(asctime)s [%(levelname)-5.5s] %(message)s")
+logger = logging.getLogger("depthid")
+logger.setLevel(logging.INFO)
+
+# todo: be able to repeat previous session by using parameters.json
+# todo: add command to reset to 0,0,0, homing doesn't work, figure out persistence
+# todo: clean camera up parameters
+# todo: test all the camera output formats
+# todo: refactor wait_before/wait_after canon
+# todo: Test Bayer RG 16
+
+
+def main(config_fh: TextIO):
     config = load_config(config_fh)
-    job = Job.load(
-        job_fh=job_fh,
+    job = Job(
         controller=Controller(**config['controller']),
-        camera=Camera(**config['camera']),
+        camera=load_camera(**config['camera']),
+        **config['job']
     )
-    job.setup()
+
+    try:
+        job.initialize()
+    except JobException:
+        logger.error(f"Job encountered a problem during initialization, shutting down")
+        job.shutdown()
+        exit(1)
+
     try:
         job.run()
+    except JobException:
+        logger.error(f"Job encountered a problem during run, shutting down")
     except KeyboardInterrupt:
+        logger.info("Job cancelled due to keyboard interrupt")
+    finally:
         job.shutdown()
-        exit("Job cancelled due to keyboard interrupt")
 
 
 if __name__ == "__main__":
@@ -32,13 +55,6 @@ if __name__ == "__main__":
         dest='config_fh',
         type=argparse.FileType('r'),
         help='JSON configuration filename',
-        required=True
-    )
-    parser.add_argument(
-        '--job',
-        dest='job_fh',
-        type=argparse.FileType('r'),
-        help='JSON job filename',
         required=True
     )
     args = parser.parse_args()

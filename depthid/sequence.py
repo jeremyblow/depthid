@@ -11,21 +11,21 @@ class Sequence:
 
         [(axis, position), (axis, position), (axis, position)]
 
-    Where `axis` is a x, y, z, or w string, and `position` is an integer representing the position
+    Where `axis` is a x, y, or z string, and `position` is an integer representing the position
     on the axis.
 
     Waypoints are typically loaded from a coordinate set contained in a list of coordinates, in the
     form:
 
-        [(x, y, z, w), (x, y, z, w), (x, y, z, w)]
+        [(x, y, z), (x, y, z), (x, y, z)]
 
-    Where x, y, z, and w are integers representing position on each axis. 1, 2, 3, or 4 dimensions
+    Where x, y, and z are integers representing position on each axis. 1, 2, or 3 dimensions
     are currently permitted as input.
     """
 
-    axes = ('x', 'y', 'z', 'w')
+    axes = ('x', 'y', 'z')
 
-    def __init__(self, waypoints: list=None):
+    def __init__(self, waypoints: list = None):
         self.waypoints = waypoints if waypoints is not None else []
 
     @classmethod
@@ -33,7 +33,6 @@ class Sequence:
         sequence = cls()
         for coordinate in coordinates:
             sequence.add(coordinate)
-        print(f"Initialized {len(sequence)} waypoints")
         return sequence
 
     @classmethod
@@ -44,11 +43,13 @@ class Sequence:
     @classmethod
     def generate(cls, parameters):
         waypoint = []
-        def do_axis(dimensions, axis, start, stop, step):
-            for position in range(int(start), int(stop) + (1, -1)[int(step) < 0], int(step)):
+
+        def do_axis(dims, axis, start, stop, step):
+            # todo: int(step) or 1 should be refactored
+            for position in range(int(start), int(stop) + (1, -1)[int(step) < 0], int(step) or 1):
                 waypoint.append((axis, position))
                 try:
-                    yield from do_axis(dimensions[1:], **dimensions[1])
+                    yield from do_axis(dims[1:], **dims[1])
                 except IndexError:
                     yield waypoint[:]
                 finally:
@@ -61,7 +62,6 @@ class Sequence:
         sequence = cls(
             waypoints=[x for x in do_axis(dimensions, **dimensions[0])]
         )
-        print(f"Initialized {len(sequence)} waypoints")
         return sequence
 
     def add(self, coordinate):
@@ -84,3 +84,6 @@ class Sequence:
 
     def __len__(self):
         return len(self.waypoints)
+
+    def __bool__(self):
+        return bool(len(self.waypoints))
