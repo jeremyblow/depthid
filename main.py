@@ -3,9 +3,6 @@ import logging
 from typing import TextIO
 
 from depthid.job import Job, JobException
-from depthid.camera import load_camera
-from depthid.controller import Controller
-from depthid.util import load_config
 
 
 logging.basicConfig(format="%(asctime)s [%(levelname)-5.5s] %(message)s")
@@ -19,14 +16,12 @@ logger.setLevel(logging.INFO)
 # todo: refactor wait_before/wait_after canon
 # todo: Test Bayer RG 16
 
+# new todo:
+# todo: need to pass image info into display call
+
 
 def main(config_fh: TextIO):
-    config = load_config(config_fh)
-    job = Job(
-        controller=Controller(**config['controller']),
-        camera=load_camera(**config['camera']),
-        **config['job']
-    )
+    job = Job.load(config_fh)
 
     try:
         job.initialize()

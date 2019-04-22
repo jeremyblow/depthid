@@ -4,18 +4,18 @@ from time import sleep, time
 
 from serial import Serial, SerialException
 
+from .exception import ControllerException
+from .motor import Motor
+
 
 logger = logging.getLogger("depthid")
-
-
-class ControllerException(Exception):
-    pass
 
 
 class Controller:
 
     timeout = 5
     linefeed = '\n'
+    banner = None
     est_step_time = 0.04
     est_move_time = 0.06
     pos_pattern = re.compile(r"MPos:(?P<x>[\d.-]+),?(?P<y>[\d.-]+)?,?(?P<z>[\d.-]+)?")
@@ -30,7 +30,7 @@ class Controller:
         self.baud_rate = baud_rate
         self.serial = None
         self.motors = {axis: Motor(axis, microstep) for axis, microstep in motors}
-        self.position = {axis: None for axis in self.motors}
+        self.position = {axis: '0.000' for axis in self.motors}
 
     def connect(self):
         try:
@@ -47,9 +47,9 @@ class Controller:
         message = [self.receive() for _ in range(2)][1]
 
         try:
-            assert 'Grbl' in message
+            assert self.banner in message
         except AssertionError:
-            raise ControllerException(f"Failed to receive init from controller; expected Grbl' in '{message}'")
+            raise ControllerException(f"Failed to receive init from controller; expected {self.banner}' in '{message}'")
 
         self.send("G0")
 
@@ -57,8 +57,15 @@ class Controller:
             self.wait_for("ok", timeout=3)
         except TimeoutError:
             raise ControllerException(f"Timeout while waiting for controller to acknowledge init command")
-        else:
-            return self.serial
+
+        self.send("$100 = 1")
+        self.wait_for("ok")
+        self.send("$101 = 1")
+        self.wait_for("ok")
+        self.send("$102 = 1")
+        self.wait_for("ok")
+
+        return self.serial
 
     def send(self, message, send_linefeed=True):
         linefeed = self.linefeed if send_linefeed else ""
@@ -83,6 +90,7 @@ class Controller:
         else:
             message = message.rstrip()
             logger.debug(f"Recv {message}")
+
         return message
 
     def move(self, waypoint):
@@ -96,7 +104,7 @@ class Controller:
             G90: Switch to absolution positioning mode
             G91: Switch to incremental positioning mode
         """
-        cmd = "G90 G53 {}".format(
+        cmd = "G0 G90 G53 {}".format(
             " ".join([f"{k.upper()}{v}" for k, v in waypoint.items() if v is not None])
         )
         self.send(cmd)
@@ -129,8 +137,8 @@ class Controller:
 
     def home(self):
         # Do individually in case we're underpowered
-        for motor in self.motors.values():
-            self.move({motor.axis: "0.000"})
+        self.move({m.axis: "0.000" for m in self.motors.values()})
+        # for motor in self.motors.values():
 
     def update_position(self):
         # todo: describe behavior
@@ -156,7 +164,8 @@ class Controller:
         pos = self.update_position()
         # todo: fix up float/string handling
         dist = max(abs(float(pos[k]) - float(waypoint[k])) for k in waypoint)
-        timeout = dist * self.est_step_time * 2
+        # todo: refactor this magic constant
+        timeout = dist * self.est_step_time * 20
         start = time()
         while not waypoint.items() <= self.update_position().items():
             if time() > start + timeout:
@@ -172,49 +181,5 @@ class Controller:
             # Don't raise exception if serial is unset
             pass
 
-    @property
-    def parameters(self):
-        return dict(
-            device_name=self.device_name,
-            baud_rate=self.baud_rate,
-            motors=[m.parameters for m in self.motors.values()]
-        )
-
     def __repr__(self):
-        return f"{len(self.motors)}-Axis Grbl Motor Controller"
-
-
-class Motor:
-
-    allowed_microsteps = (
-        1.0,
-        0.5,
-        0.25,
-        0.125,
-        0.0625
-    )
-    allowed_axes = ('x', 'y', 'z')
-
-    def __init__(self, axis: str, microstep: float = .25):
-
-        self.axis = axis
-        self.microstep = microstep
-        self.validate()
-
-    def validate(self):
-
-        try:
-            assert self.axis in self.allowed_axes
-        except AssertionError:
-            raise ControllerException(f"{self.axis} label not in {self.allowed_axes}")
-
-        try:
-            assert self.microstep in self.allowed_microsteps
-        except AssertionError:
-            raise ControllerException(
-                f"{self.axis} microstep {self.microstep} not in {self.allowed_microsteps}"
-            )
-
-    @property
-    def parameters(self):
-        return [self.axis, self.microstep]
+        return f"{len(self.motors)}-Axis {self.banner} Motor Controller"

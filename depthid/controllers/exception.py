@@ -1,0 +1,2 @@
+class ControllerException(Exception):
+    pass

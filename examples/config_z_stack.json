@@ -11,13 +11,13 @@
   "camera": {
     "interface": "spinnaker",
     "camera_index": 0,
-    "height": 1920,
-    "width": 1200,
+    "height": 1200,
+    "width": 1920,
     "pixel_format": "Mono 16",
     "display_format": "Mono 16",
     "save_formats": ["raw", "tiff"],
-    "exposure_us": 19431,
-    "gain_db": 23
+    "exposure_us": 54725.17013549805,
+    "gain_db": 15
   },
   "job": {
     "name": "z_stack",

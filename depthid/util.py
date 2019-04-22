@@ -15,9 +15,6 @@ def pathify(path):
     return path.replace('\\', '/').rstrip('/')
 
 
-def load_config(config_fh):
-    with config_fh as fh:
-        return json.load(fh)
 
 
 def to_csv(waypoint: dict):
