@@ -4,31 +4,6 @@ from numpy import ndarray
 from PySpin import Image, HQ_LINEAR, IEnumerationT_PixelFormatEnums, Camera
 
 
-def convert_format(data: Image, output_format: IEnumerationT_PixelFormatEnums) -> Image:
-    """Transforms PySpin image into specified output format.
-
-    Arguments:
-        data (Image): Source image
-        output_format (IEnumerationT_PixelFormatEnums): Output format
-
-    Returns:
-        data (Image)
-    """
-    return data.Convert(output_format, HQ_LINEAR)
-
-
-def transform_ndarray(data: Image) -> ndarray:
-    """Transforms PySpin image into numpy ndarray.
-
-    Arguments:
-        data (Image): Source image.
-
-    Returns:
-        data (ndarray)
-    """
-    return data.GetNDArray()
-
-
 def capture(camera: Camera, wait_before: float, wait_after: float) -> Image:
     """Captures image from camera.
 
@@ -45,6 +20,31 @@ def capture(camera: Camera, wait_before: float, wait_after: float) -> Image:
     image.Release()
     sleep(wait_after)
     return image
+
+
+def transform_ndarray(data: Image) -> ndarray:
+    """Transforms PySpin image into numpy ndarray.
+
+    Arguments:
+        data (Image): Source image.
+
+    Returns:
+        data (ndarray)
+    """
+    return data.GetNDArray()
+
+
+def convert_format(data: Image, output_format: IEnumerationT_PixelFormatEnums) -> Image:
+    """Transforms PySpin image into specified output format.
+
+    Arguments:
+        data (Image): Source image
+        output_format (IEnumerationT_PixelFormatEnums): Output format
+
+    Returns:
+        data (Image)
+    """
+    return data.Convert(output_format, HQ_LINEAR)
 
 
 def save(data: Image, filename: str) -> bool:

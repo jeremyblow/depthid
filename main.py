@@ -9,15 +9,20 @@ logging.basicConfig(format="%(asctime)s [%(levelname)-5.5s] %(message)s")
 logger = logging.getLogger("depthid")
 logger.setLevel(logging.INFO)
 
-# todo: be able to repeat previous session by using parameters.json
-# todo: add command to reset to 0,0,0, homing doesn't work, figure out persistence
-# todo: clean camera up parameters
 # todo: test all the camera output formats
-# todo: refactor wait_before/wait_after canon
 # todo: Test Bayer RG 16
 
-# new todo:
-# todo: need to pass image info into display call
+# todo: new new
+# todo: test faster intel python
+# todo: re-enable full screen after screenshots are taken
+# todo: can we record a full movie of the session?
+#
+# todo: be able to use m ui f display with panel arg
+# todo: make sure jobs still work
+# todo: speed up histogram display
+# todo: acquire in interactive mode doesn't work
+# tood: screen shot in interactive mode doesn't work
+# todo: at fast FPS, the button display is too fast to see
 
 
 def main(config_fh: TextIO):

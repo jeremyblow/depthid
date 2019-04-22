@@ -59,8 +59,6 @@ class Spinnaker(Camera):
         except AttributeError:
             raise CameraException(f"Invalid pixel format: {self.pixel_format}")
 
-        self.display_format = getattr(PySpin, f"PixelFormat_{self.display_format.replace(' ', '')}")
-
         self.camera.BeginAcquisition()
         return self.camera
 

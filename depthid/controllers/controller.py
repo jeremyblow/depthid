@@ -58,12 +58,10 @@ class Controller:
         except TimeoutError:
             raise ControllerException(f"Timeout while waiting for controller to acknowledge init command")
 
-        self.send("$100 = 1")
-        self.wait_for("ok")
-        self.send("$101 = 1")
-        self.wait_for("ok")
-        self.send("$102 = 1")
-        self.wait_for("ok")
+        for idx, i in enumerate((100, 101, 102)):
+            v = 1 / list(self.motors.values())[idx].microstep
+            self.send(f"${i} = {v}")
+            self.wait_for("ok")
 
         return self.serial
 

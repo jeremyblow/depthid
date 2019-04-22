@@ -9,7 +9,7 @@ from depthid import pipeline as p
 from depthid.cameras import Camera, CameraException, load_camera
 from depthid.controllers import Controller, ControllerException, load_controller
 from depthid.sequence import Sequence
-from depthid.ui import UI
+from depthid.ui.cv import UI as CVUI
 from depthid.util import pathify
 
 
@@ -24,20 +24,21 @@ class Job:
 
     def __init__(self, name: str, path: str, controller: Controller, camera: Camera, pipeline: dict, parameters: str,
                  csv_filename: str = None, sequence_parameters: str = None, coordinates: list = None,
-                 mode: str = "automatic"):
+                 mode: str = "automatic", full_screen: bool = True):
 
         self.start_time = datetime.now()
         self.name = f"{name}_{self.start_time.isoformat().replace(':', '')}"
         self.mode = mode
         self.path = pathify(path)
-        self.image_directory = f"{self.path}/{self.name}"
+        self.session_directory = f"{self.path}/{self.name}"
         self.parameters = parameters
         self.controller = controller
         self.camera = camera
         self.pipeline = pipeline
+        self.pipeline_t = ""
 
         # todo: consider pushing this out to main
-        self.ui = UI(camera=camera, controller=controller, pipeline_callback=self.do_pipeline)
+        self.ui = CVUI(camera=camera, controller=controller, job=self, full_screen=full_screen)
 
         # Statistics
         self.image_times = []
@@ -75,10 +76,10 @@ class Job:
     def initialize(self):
         # Create target directory, if doesn't already exist
         try:
-            os.makedirs(self.image_directory)
+            os.makedirs(self.session_directory)
         except OSError as e:
             if e.errno != errno.EEXIST:
-                raise JobException(f"Unable to create image directory {self.image_directory}: {e}")
+                raise JobException(f"Unable to create image directory {self.session_directory}: {e}")
 
         try:
             self.controller.initialize()
@@ -96,28 +97,13 @@ class Job:
         else:
             logger.info(f"{self.camera} initialized")
 
+        # Bind ui instance to pipeline module so that ui can be referenced at runtime
+        p.ui = self.ui
+
         self.save_parameters()
 
-    def do_pipeline(self):
-        stack = [None] * len(self.pipeline)
-        for idx, step in enumerate(self.pipeline):
-            # User is asked to specify "camera" for i val, which raises TypeError
-            # allowing us to inject the dependency
-            try:
-                i = stack[step['i']]
-            except TypeError:
-                i = self.camera.camera
-
-            fn = getattr(getattr(p, step['m']), step['f'])
-
-            if i is not None:
-                stack[idx] = fn(i, **step['kw'])
-            else:
-                stack[idx] = fn(**step['kw'])
-        return stack
-
     def run(self):
-        logger.info(f"Saving session to {self.image_directory}")
+        logger.info(f"Saving session to {self.session_directory}")
 
         if self.is_interactive:
             try:
@@ -127,6 +113,33 @@ class Job:
                 raise JobException
         # else:
         #     self.automatic()
+
+    def do_pipeline(self):
+        stack = [None] * len(self.pipeline)
+        for idx, step in enumerate(self.pipeline):
+            start = time()
+
+            # User is asked to specify "camera" for i val, which raises TypeError
+            # allowing us to inject the dependency
+            try:
+                i = stack[step['i']]
+            except KeyError:
+                i = None
+            except TypeError:
+                # todo: this is fragile, think of a better way to generalize
+                i = self.camera.camera
+
+            fn = getattr(getattr(p, step['m']), step['f'])
+
+            if i is not None:
+                stack[idx] = fn(i, **step.get("kw", {}))
+            else:
+                stack[idx] = fn(**step.get("kw", {}))
+
+            self.pipeline[idx]["time"] = time() - start
+
+        self.pipeline_t = ", ".join([f"{v['time']:.2f}" for v in self.pipeline])
+        return stack
 
     def move(self, waypoint):
         start_t = time()
@@ -156,7 +169,7 @@ class Job:
     #     self.move({'x': '0.000', 'y': '0.000', 'z': '0.000'})
 
     def save_parameters(self):
-        with open(f"{self.image_directory}/parameters.json", "w") as fh:
+        with open(f"{self.session_directory}/parameters.json", "w") as fh:
             fh.write(self.parameters)
 
     def shutdown(self):

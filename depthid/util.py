@@ -1,5 +1,5 @@
-import json
 import logging
+import os.path
 
 from getch import getch
 
@@ -7,14 +7,14 @@ from getch import getch
 logger = logging.getLogger("depthid")
 
 
-def pathify(path):
+def pathify(path: str):
     """Normalizes path input to POSIX.
 
     Windows can interpret relative POSIX paths.
     """
+    if path.startswith('~'):
+        path = os.path.expanduser(path)
     return path.replace('\\', '/').rstrip('/')
-
-
 
 
 def to_csv(waypoint: dict):
