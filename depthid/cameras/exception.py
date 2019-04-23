@@ -1,0 +1,2 @@
+class CameraException(Exception):
+    pass

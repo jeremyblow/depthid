@@ -3,30 +3,19 @@ import logging
 from typing import TextIO
 
 from depthid.job import Job, JobException
-from depthid.camera import load_camera
-from depthid.controller import Controller
-from depthid.util import load_config
 
 
 logging.basicConfig(format="%(asctime)s [%(levelname)-5.5s] %(message)s")
 logger = logging.getLogger("depthid")
 logger.setLevel(logging.INFO)
 
-# todo: be able to repeat previous session by using parameters.json
-# todo: add command to reset to 0,0,0, homing doesn't work, figure out persistence
-# todo: clean camera up parameters
 # todo: test all the camera output formats
-# todo: refactor wait_before/wait_after canon
 # todo: Test Bayer RG 16
+# todo: make sure jobs still work
 
 
 def main(config_fh: TextIO):
-    config = load_config(config_fh)
-    job = Job(
-        controller=Controller(**config['controller']),
-        camera=load_camera(**config['camera']),
-        **config['job']
-    )
+    job = Job.load(config_fh)
 
     try:
         job.initialize()

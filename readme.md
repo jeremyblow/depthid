@@ -30,30 +30,41 @@ example, available within `examples/config_win.json`:
 ```json
 {
   "controller": {
-    "device_name": "COM3",
+    "interface": "grbl",
+    "device_name": "COM4",
     "baud_rate": 115200,
     "motors": [
-      ["x", 1.00],
+      ["x", 0.50],
       ["y", 0.50],
-      ["z", 1.00]
+      ["z", 0.50]
     ]
   },
   "camera": {
     "interface": "spinnaker",
     "camera_index": 0,
-    "height": 1920,
-    "width": 1200,
+    "height": 1200,
+    "width": 1920,
     "pixel_format": "Mono 16",
-    "display_format": "Mono 16",
-    "save_formats": ["raw", "tiff"],
-    "exposure_us": 19431,
-    "gain_db": 0
+    "exposure_us": 54725.17013549805,
+    "gain_db": 15
   },
   "job": {
     "name": "interactive_session",
-    "path": "data/",
+    "path": "~/Desktop/data/",
     "mode": "interactive",
-    "wait_after": 0.1
+    "full_screen": false,
+    "save_formats": ["tiff", "raw"],
+    "pipeline": [
+      {"m": "spinnaker", "f": "capture", "i": "camera", "kw": {"wait_before":  0.0, "wait_after": 0.0}},
+      {"m": "spinnaker", "f": "transform_ndarray", "i": 0},
+      {"m": "opencv", "f": "gray_to_rgb", "i": 1},
+      {"m": "opencv", "f": "histogram", "i": 1, "kw": {"bins": 1000}},
+      {"m": "mpl", "f": "plot_histogram_fast", "i": 3, "kw": {"log": "10"}},
+      {"m": "ui", "f": "display", "i": 2, "kw": {"panel": "main"}},
+      {"m": "ui", "f": "display_menu", "kw": {"panel": "sub1"}},
+      {"m": "ui", "f": "display", "i": 4, "kw": {"panel": "sub2"}},
+      {"m": "ui", "f": "display_status"}
+    ]
   }
 }
 ```
@@ -62,7 +73,7 @@ example, available within `examples/config_win.json`:
 
 The second parameter for each motor is the motor's microstep. This value should reflect the 
 the setting on the hardware controller, which is typically set via jumpers. `1.00` indicates 
-a full step.
+a full step. Currently Grbl controllers are supported. 
 
 ##### Camera
 
@@ -77,9 +88,6 @@ be beneficial to allow the camera to perform an initial transformation.
 
 Otherwise, it is recommended to select a raw format which matches the bit depth of the 
 camera's ADC (e.g. `Bayer RG 12`). 
-
-`display_format`, when set, will utilize OpenCV to display the image on screen. An image will 
-be saved to disk in every format specified in the `save_formats` array.
 
 Additional camera settings are configured on a per-job basis. 
 
@@ -100,7 +108,9 @@ specified start value, increasing or decreasing by the step(difference) value
 on the given axis, until the next progression would exceed the stop value. 
 Sequences are nested in the specified order, allow negative steps, and may 
 start at any position on the axis. It is not required to use all three axes; 
-you may specify from one to four axes, as desired.
+you may specify from one to three axes, as desired. Values may be expressed as
+integers or floating point numbers. 
+
 Example:
 
     "x(0,1,1),y(1,6,3),z(0,-1,-1)"
@@ -126,6 +136,9 @@ CSV and inline coordinates are in the format:
 If only moving on a single axis, you may exclude other axes, e.g. `,,1` for CSV and `null,null,1`
 for inline coordinates. 
 
+An image will be saved to disk in every format specified in the `save_formats` array, or as specified
+in a pipeline `save` directive. Documentation regarding pipelines is pending. 
+
 
 ### Usage
 
@@ -134,7 +147,7 @@ prior to execution. Usage example:
 
     python main.py --config examples/config_win.json
     
-When mode is set to `automatic`, progress will displayed on the terminal:
+When mode is set to `automatic`, progress will displayed on the terminal or in the UI:
 
     2.22%, Waypoint 1/45, Time 0:00:02.691880/0:07:33.944381, X0 Y0 Z0
     4.44%, Waypoint 2/45, Time 0:00:09.404582/0:07:31.985596, X0 Y0 Z200
@@ -145,24 +158,6 @@ When mode is set to `automatic`, progress will displayed on the terminal:
     15.56%, Waypoint 7/45, Time 0:01:02.532876/0:07:29.521698, X0 Y200 Z200
     ...
 
-When the mode is set to `interactive`, the following options will be available:
-
-    LEFT/RIGHT        : X
-    UP/DOWN           : Y
-    PAGE UP/PAGE DOWN : Z
-    +/-               : XY step size
-    INSERT/DELETE     : Z step size
-    HOME              : Return motors to configured home coordinate
-    e/E               : Decrease/increase exposure time
-    g/G               : Decrease/increase gain
-    ENTER             : Save image
-    p                 : Get current position
-    t                 : Toggle position display
-    r                 : Reset controller
-    f                 : Display camera features
-    s                 : Display camera settings
-    h                 : Display this help
-    q                 : Quit
 
 ### Safety
 
