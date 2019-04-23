@@ -45,8 +45,34 @@ class Sequence:
         waypoint = []
 
         def do_axis(dims, axis, start, stop, step):
-            # todo: int(step) or 1 should be refactored
-            for position in range(int(start), int(stop) + (1, -1)[int(step) < 0], int(step) or 1):
+            # todo: add infinite loop avoidance
+            stop_v = float(stop)
+            curr_v = float(start)
+            step_v = float(step)
+            positions = [curr_v]
+            while True:
+
+                if step_v < 0:
+                    # Descending
+                    if curr_v <= stop_v:
+                        # Limit reached
+                        break
+                    else:
+                        curr_v += step_v
+                        positions.append(curr_v)
+                elif step_v > 0:
+                    # Ascending
+                    if curr_v >= stop_v:
+                        # Limit reached
+                        break
+                    else:
+                        curr_v += step_v
+                        positions.append(curr_v)
+                else:
+                    # No action, we're done
+                    break
+
+            for position in positions:
                 waypoint.append((axis, position))
                 try:
                     yield from do_axis(dims[1:], **dims[1])
@@ -56,7 +82,7 @@ class Sequence:
                     waypoint.pop()
 
         p = re.compile(
-            r'(?P<axis>[{}])\((?P<start>[\d-]+),(?P<stop>[\d-]+),(?P<step>[\d-]+)\),?'.format(''.join(cls.axes))
+            r'(?P<axis>[{}])\((?P<start>[\d.-]+),(?P<stop>[\d.-]+),(?P<step>[\d.-]+)\),?'.format(''.join(cls.axes))
         )
         dimensions = [m.groupdict() for m in p.finditer(parameters)]
         sequence = cls(

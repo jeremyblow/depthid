@@ -15,7 +15,6 @@
     "height": 1200,
     "width": 1920,
     "pixel_format": "Mono 16",
-    "save_formats": ["raw", "tiff"],
     "exposure_us": 54725.17013549805,
     "gain_db": 15
   },
@@ -23,17 +22,17 @@
     "name": "interactive_session",
     "path": "~/Desktop/data/",
     "mode": "interactive",
-    "full_screen": false,
+    "full_screen": true,
+    "save_formats": ["tiff"],
     "pipeline": [
       {"m": "spinnaker", "f": "capture", "i": "camera", "kw": {"wait_before":  0.0, "wait_after": 0.0}},
       {"m": "spinnaker", "f": "transform_ndarray", "i": 0},
       {"m": "opencv", "f": "gray_to_rgb", "i": 1},
-      {"m": "opencv", "f": "histogram", "i": 1},
-      {"m": "mpl", "f": "plot_histogram", "i":  3},
-      {"m": "ui", "f": "display", "i":  2, "kw": {"panel": "main"}},
+      {"m": "opencv", "f": "histogram", "i": 1, "kw": {"bins": 1000}},
+      {"m": "mpl", "f": "plot_histogram_fast", "i": 3, "kw": {"log": "10"}},
+      {"m": "ui", "f": "display", "i": 2, "kw": {"panel": "main"}},
       {"m": "ui", "f": "display_menu", "kw": {"panel": "sub1"}},
-      {"m": "ui", "f": "display", "i":  4, "kw": {"panel": "sub2"}},
-      {"m": "ui", "f": "display", "i":  4, "kw": {"panel": "sub3"}},
+      {"m": "ui", "f": "display", "i": 4, "kw": {"panel": "sub2"}},
       {"m": "ui", "f": "display_status"}
     ]
   }

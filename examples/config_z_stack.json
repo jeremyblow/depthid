@@ -1,11 +1,12 @@
 {
   "controller": {
-    "device_name": "COM3",
+    "interface": "grbl",
+    "device_name": "COM4",
     "baud_rate": 115200,
     "motors": [
-      ["x", 1.00],
+      ["x", 0.50],
       ["y", 0.50],
-      ["z", 1.00]
+      ["z", 0.50]
     ]
   },
   "camera": {
@@ -14,15 +15,26 @@
     "height": 1200,
     "width": 1920,
     "pixel_format": "Mono 16",
-    "save_formats": ["raw", "tiff"],
     "exposure_us": 54725.17013549805,
     "gain_db": 15
   },
   "job": {
     "name": "z_stack",
-    "path": "data/",
+    "path": "~/Desktop/data/",
     "mode": "automatic",
-    "wait_after": 0.03,
-    "sequence_parameters": "x(0,0,0),y(0,0,0),z(0,99,1)"
+    "full_screen": true,
+    "save_formats": ["tiff", "raw"],
+    "sequence_parameters": "x(0,0,0),y(0,0,0),z(0,-9.5,-0.5)",
+    "pipeline": [
+      {"m": "spinnaker", "f": "capture", "i": "camera", "kw": {"wait_before":  0.15, "wait_after": 0.03}},
+      {"m": "spinnaker", "f": "transform_ndarray", "i": 0},
+      {"m": "opencv", "f": "gray_to_rgb", "i": 1},
+      {"m": "opencv", "f": "histogram", "i": 1, "kw": {"bins": 1000}},
+      {"m": "mpl", "f": "plot_histogram_fast", "i": 3, "kw": {"log": "10"}},
+      {"m": "ui", "f": "display", "i": 2, "kw": {"panel": "main"}},
+      {"m": "ui", "f": "display", "i": 4, "kw": {"panel": "sub1"}},
+      {"m": "ui", "f": "display_status"},
+      {"m": "job", "f": "save", "i": 0, "kw": {"formats": ["tiff", "raw"]}}
+    ]
   }
 }

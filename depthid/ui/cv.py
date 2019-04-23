@@ -6,7 +6,6 @@ from queue import Empty, Queue
 import cv2
 import numpy as np
 
-# todo: this is spinnaker specific, improve
 from depthid.cameras import CameraException
 from depthid.controllers import ControllerException
 from depthid.pipeline.scikit import convert_uint8_uint16
@@ -72,11 +71,12 @@ class UI:
 
     # min_h, min_w, max_h, max_w
     panel_map = {
-        "main": (0, 0, 1279, 1919),
-        "sub1": (0, 1920, win_h - 1, win_w - 1),
-        "sub2": (int(win_h * .33), 1920, int(win_h * .66), win_w - 1),
-        "sub3": (int(win_h * .66), 1920, win_h, win_w - 1),
-        "status": (1280, 0, win_h - 1, win_w - 1)
+        "main_border": (0, 0, 1281, 1921),
+        "main": (1, 1, 1280, 1920),
+        "sub1": (0, 1922, win_h - 1, win_w - 1),
+        "sub2": (int(win_h * .33), 1922, int(win_h * .66), win_w - 1),
+        "sub3": (int(win_h * .66), 1922, win_h, win_w - 1),
+        "status": (1282, 0, win_h - 1, win_w - 1)
     }
 
     # Interactive mode runtime controls
@@ -85,6 +85,8 @@ class UI:
     pos_enabled = False
     adj_factor = .05
     last_key = None
+    last_bg = None
+    last_main = None
     running = True
     fps = 0
 
@@ -103,6 +105,7 @@ class UI:
     motor_clr = np.array([0.895, 0.383, 0.00]) * scale
     camera_clr = np.array([0.894, 0.205, 0.739]) * scale
     depthid_clr = np.array([0.0, 0.136, .904]) * scale
+    white_clr = np.array([1, 1, 1]) * scale
 
     def __init__(self, camera, controller, job, full_screen=True):
         self.camera = camera
@@ -114,7 +117,7 @@ class UI:
 
         # Generate window image and main panel border
         self.bg = np.zeros((self.win_h, self.win_w, self.win_channels), dtype=self.win_dtype)
-        cv2.rectangle(self.bg, (0, 0), (self.main_w, self.main_h), (10000, 10000, 10000))
+        cv2.rectangle(self.bg, self.panel_map['main_border'][:2], self.panel_map['main_border'][3:1:-1], self.white_clr.tolist())
 
         if full_screen:
             cv2.namedWindow("DepthID", cv2.WND_PROP_FULLSCREEN)
@@ -140,41 +143,65 @@ class UI:
             # todo: key spamming blocks redraw
 
             self.job.do_pipeline()
-            cv2.imshow("DepthID", self.bg)
+            self.refresh()
             self.fps = 1.0 / (time() - start)
 
         t.join()
 
-    def display(self, data: np.ndarray, panel: str):
+    def refresh(self, wait_key=False):
+        cv2.imshow("DepthID", self.bg)
+        self.last_bg = self.bg.copy()
+        if wait_key:
+            return cv2.waitKey(1)
+
+    def display(self, data: np.ndarray, panel: str, l_offset: int = 0, t_offset: int = 0):
         min_h, min_w, max_h, max_w = self.panel_map[panel]
         image_h, image_w, image_d = data.shape
-        self.bg[min_h:min_h + image_h, min_w:min_w + image_w, :] = data
+        self.bg[
+            min_h + t_offset:min_h + t_offset + image_h,
+            min_w + l_offset:min_w + l_offset + image_w,
+            :
+        ] = data
+        if panel == "main":
+            self.last_main = data
         return data
 
     def display_menu(self, panel: str = "status"):
         data = getattr(self, f"menu_{self.last_key}", self.menu)
-        self.display(data, panel)
+        self.display(data, panel, l_offset=75, t_offset=25)
         self.last_key = None
         return data
 
     def display_status(self, panel: str = "status"):
         panel_w = self.main_w
-        panel_h = 120
+        panel_h = 110
         font = cv2.FONT_HERSHEY_SIMPLEX, .7
 
-        motor = (
-            f"Position: {', '.join([str(p) for p in self.controller.position.values()])} "
-            f"Step Size: {self.xy_step_size}, {self.xy_step_size}, {self.z_step_size} "
-            f"Microstep: {', '.join([str(m.microstep) for m in self.controller.motors.values()])}"
-        )
-        camera = (
-            "Exposure: {ExposureTime:.6f} us ({ExposureTime%:.2%}) "
-            "Gain: {Gain:.6f} dB ({Gain%:.2%}) "
-            "AdjFactor: {adj:.0%} "
-            "Dimensions: {Width}x{Height} "
-            "Format: {PixelFormat}"
-        ).format(adj=self.adj_factor, **self.camera.settings)
-        depthid = f"FPS: {self.fps:.2f} PipelineT: {self.job.pipeline_t}"
+        if self.job.status:
+            depthid = f"Job: {self.job.status()}"
+            camera = (
+                "Exposure: {ExposureTime:.6f} us ({ExposureTime%:.2%}) "
+                "Gain: {Gain:.6f} dB ({Gain%:.2%}) "
+                "Dimensions: {Width}x{Height} "
+                "Format: {PixelFormat}"
+            ).format(adj=self.adj_factor, **self.camera.settings)
+            motor = (
+                f"Position: {', '.join([str(p) for p in self.controller.position.values()])} "
+            )
+        else:
+            depthid = f"FPS: {self.fps:.2f} PipelineT: {self.job.pipeline_t}"
+            camera = (
+                "Exposure: {ExposureTime:.6f} us ({ExposureTime%:.2%}) "
+                "Gain: {Gain:.6f} dB ({Gain%:.2%}) "
+                "AdjFactor: {adj:.0%} "
+                "Dimensions: {Width}x{Height} "
+                "Format: {PixelFormat}"
+            ).format(adj=self.adj_factor, **self.camera.settings)
+            motor = (
+                f"Position: {', '.join([str(p) for p in self.controller.position.values()])} "
+                f"Step Size: {self.xy_step_size}, {self.xy_step_size}, {self.z_step_size} "
+                f"Microstep: {', '.join([str(m.microstep) for m in self.controller.motors.values()])}"
+            )
         directory = f"Directory: {self.job.session_directory}"
 
         data = np.zeros((panel_h, panel_w, self.win_channels))
@@ -182,7 +209,7 @@ class UI:
         cv2.putText(data, camera, (0, 50), *font, self.camera_clr.tolist(), 1)
         cv2.putText(data, depthid, (0, 75), *font, self.depthid_clr.tolist(), 1)
         cv2.putText(data, directory, (0, 100), *font, self.depthid_clr.tolist(), 1)
-        self.display(data, panel)
+        self.display(data, panel, l_offset=15, t_offset=5)
         return data
 
     def menu_loop(self):
@@ -265,13 +292,9 @@ class UI:
         elif key == "f":
             log_dict(self.camera.features, banner="Camera Features")
         elif key == "enter":
-            # todo: this barfs
-            # fn = self.acquire(self.controller.update_position())
-            # logger.info(f"Saved {', '.join(self.camera.save_formats)}: {fn}")
-            pass
+            self.job.save(self.last_main, self.controller.position)
         elif key == "space":
-            # todo: implement screen cap
-            pass
+            self.job.save(self.last_bg, self.controller.position)
 
         # Other control
         if key == "p":

@@ -23,11 +23,6 @@ class OpenCV(Camera):
     def capture(self):
         return self.camera.read()[1]
 
-    def save(self, img, filename):
-        for save_format in self.save_formats:
-            fn = f"{filename}.{save_format}"
-            cv2.imwrite(fn, img)
-
     @property
     def parameters(self):
         """Convenience function to return current camera properties."""

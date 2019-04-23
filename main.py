@@ -11,18 +11,7 @@ logger.setLevel(logging.INFO)
 
 # todo: test all the camera output formats
 # todo: Test Bayer RG 16
-
-# todo: new new
-# todo: test faster intel python
-# todo: re-enable full screen after screenshots are taken
-# todo: can we record a full movie of the session?
-#
-# todo: be able to use m ui f display with panel arg
 # todo: make sure jobs still work
-# todo: speed up histogram display
-# todo: acquire in interactive mode doesn't work
-# tood: screen shot in interactive mode doesn't work
-# todo: at fast FPS, the button display is too fast to see
 
 
 def main(config_fh: TextIO):
