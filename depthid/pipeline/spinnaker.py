@@ -4,7 +4,7 @@ from numpy import ndarray
 from PySpin import Image, HQ_LINEAR, IEnumerationT_PixelFormatEnums, Camera
 
 
-def capture(camera: Camera, wait_before: float, wait_after: float) -> Image:
+def capture(camera: Camera, wait_before: float, wait_after: float, **state) -> Image:
     """Captures image from camera.
 
     Arguments:
@@ -22,7 +22,7 @@ def capture(camera: Camera, wait_before: float, wait_after: float) -> Image:
     return image
 
 
-def transform_ndarray(data: Image) -> ndarray:
+def transform_ndarray(data: Image, **state) -> ndarray:
     """Transforms PySpin image into numpy ndarray.
 
     Arguments:
@@ -34,7 +34,7 @@ def transform_ndarray(data: Image) -> ndarray:
     return data.GetNDArray()
 
 
-def convert_format(data: Image, output_format: IEnumerationT_PixelFormatEnums) -> Image:
+def convert_format(data: Image, output_format: IEnumerationT_PixelFormatEnums, **state) -> Image:
     """Transforms PySpin image into specified output format.
 
     Arguments:
@@ -47,7 +47,7 @@ def convert_format(data: Image, output_format: IEnumerationT_PixelFormatEnums) -
     return data.Convert(output_format, HQ_LINEAR)
 
 
-def save(data: Image, filename: str) -> bool:
+def save(data: Image, filename: str, **state) -> bool:
     """Saves provided image to disk using specified filename.
 
     Arguments:

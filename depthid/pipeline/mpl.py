@@ -16,7 +16,7 @@ g_cache = {}
 np.seterr(divide='ignore')
 
 
-def plot_histogram_fast(data: np.ndarray, log: str = "10", name: str = "1"):
+def plot_histogram_fast(data: np.ndarray, log: str = "10", name: str = "1", x_limit: int = 1000, **state):
     global g_cache
 
     try:
@@ -32,6 +32,7 @@ def plot_histogram_fast(data: np.ndarray, log: str = "10", name: str = "1"):
         fig, ax = plt.subplots()
         plt.title("Pixel Intensity")
         plt.xlabel(f"Intensity ({len(data)} bin)")
+        plt.xlim(right=x_limit)
         if log is not None:
             plt.ylabel(f"# of Pixels (log{log})")
         else:
@@ -57,7 +58,7 @@ def plot_histogram_fast(data: np.ndarray, log: str = "10", name: str = "1"):
     return d.astype(np.uint16) / d.max() * 65536
 
 
-def plot_histogram(data: np.ndarray):
+def plot_histogram(data: np.ndarray, **state):
     fig = plt.figure()
     fig.tight_layout(pad=0)
     plot = fig.add_subplot(111)

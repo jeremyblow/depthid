@@ -22,18 +22,23 @@
     "name": "interactive_session",
     "path": "~/Desktop/data/",
     "mode": "interactive",
-    "full_screen": true,
-    "save_formats": ["tiff"],
+    "full_screen": false,
+    "save_formats": ["tiff", "png"],
     "pipeline": [
-      {"m": "spinnaker", "f": "capture", "i": "camera", "kw": {"wait_before":  0.0, "wait_after": 0.0}},
-      {"m": "spinnaker", "f": "transform_ndarray", "i": 0},
-      {"m": "opencv", "f": "gray_to_rgb", "i": 1},
-      {"m": "opencv", "f": "histogram", "i": 1, "kw": {"bins": 1000}},
-      {"m": "mpl", "f": "plot_histogram_fast", "i": 3, "kw": {"log": "10"}},
-      {"m": "ui", "f": "display", "i": 2, "kw": {"panel": "main"}},
       {"m": "ui", "f": "display_menu", "kw": {"panel": "sub1"}},
-      {"m": "ui", "f": "display", "i": 4, "kw": {"panel": "sub2"}},
-      {"m": "ui", "f": "display_status"}
+      {"m": "ui", "f": "display_status"},
+      {"m": "spinnaker", "f": "capture", "i": "camera", "kw": {"wait_before":  0.0, "wait_after": 0.0}},
+      {"m": "spinnaker", "f": "transform_ndarray", "i": 2},
+      {"m": "numpy", "f": "region_of_interest", "i": 3, "kw": {"y_min": 125, "y_max": 275, "x_min": 430, "x_max": 630}},
+      {"m": "opencv", "f": "gray_to_rgb", "i": 3},
+      {"m": "opencv", "f":  "overlay_rectangle", "i": 5, "kw": {"upper_left": [430, 125], "lower_right": [630, 275]}},
+      {"m": "ui", "f": "display", "i": 6, "kw": {"panel": "main"}},
+      {"m": "pipeline", "f": "noop", "kw": {"x_min": -1}},
+      {"m": "opencv", "f": "histogram", "i": 4, "kw": {"bins": 1000}},
+      {"m": "astropy", "f": "find_centroids", "i": 4, "kw": {"sigma": 3.0, "iters": 10, "fwhm": 7, "threshold": 5}},
+      {"m": "mpl", "f": "plot_histogram_fast", "i": 9, "kw": {"log": "10"}},
+      {"m": "ui", "f": "display", "i": 10, "kw": {"panel": "sub2"}},
+      {"m": "ui", "f": "display", "i": 11, "kw": {"panel": "sub3"}}
     ]
   }
 }

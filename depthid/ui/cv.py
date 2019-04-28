@@ -6,17 +6,15 @@ from queue import Empty, Queue
 import cv2
 import numpy as np
 
+from depthid import job
 from depthid.cameras import CameraException
 from depthid.controllers import ControllerException
 from depthid.pipeline.scikit import convert_uint8_uint16
+from depthid.ui import UIException
 from depthid.util import log_dict, to_csv
 
 
 logger = logging.getLogger("depthid")
-
-
-class UIException(Exception):
-    pass
 
 
 class UI:
@@ -71,12 +69,12 @@ class UI:
 
     # min_h, min_w, max_h, max_w
     panel_map = {
-        "main_border": (0, 0, 1281, 1921),
+        "main_border": (0, 0, 1201, 1921),
         "main": (1, 1, 1280, 1920),
         "sub1": (0, 1922, win_h - 1, win_w - 1),
         "sub2": (int(win_h * .33), 1922, int(win_h * .66), win_w - 1),
         "sub3": (int(win_h * .66), 1922, win_h, win_w - 1),
-        "status": (1282, 0, win_h - 1, win_w - 1)
+        "status": (1202, 0, win_h - 1, win_w - 1)
     }
 
     # Interactive mode runtime controls
@@ -91,7 +89,7 @@ class UI:
     fps = 0
 
     main_w = 1920
-    main_h = 1280
+    main_h = 1200
     edge_pad = 20
     asset_dir = "depthid/assets/menu_images/"
     menu = convert_uint8_uint16(cv2.imread(f"{asset_dir}/depthid_menu.png", cv2.IMREAD_UNCHANGED))
@@ -142,9 +140,13 @@ class UI:
 
             # todo: key spamming blocks redraw
 
-            self.job.do_pipeline()
-            self.refresh()
-            self.fps = 1.0 / (time() - start)
+            try:
+                self.job.do_pipeline()
+            except job.JobException:
+                self.running = False
+            else:
+                self.refresh()
+                self.fps = 1.0 / (time() - start)
 
         t.join()
 
@@ -154,30 +156,37 @@ class UI:
         if wait_key:
             return cv2.waitKey(1)
 
-    def display(self, data: np.ndarray, panel: str, l_offset: int = 0, t_offset: int = 0):
+    def display(self, data: np.ndarray, panel: str, l_offset: int = 0, t_offset: int = 0, **state):
         min_h, min_w, max_h, max_w = self.panel_map[panel]
         image_h, image_w, image_d = data.shape
-        self.bg[
-            min_h + t_offset:min_h + t_offset + image_h,
-            min_w + l_offset:min_w + l_offset + image_w,
-            :
-        ] = data
+        try:
+            self.bg[
+                min_h + t_offset:min_h + t_offset + image_h,
+                min_w + l_offset:min_w + l_offset + image_w,
+                :
+            ] = data
+        except ValueError as e:
+            raise UIException(
+                f"Failed to render, this is usually due a pipeline sequence misconfiguration, "
+                f"or a transformation error. Reason: {e}"
+            )
+
         if panel == "main":
             self.last_main = data
         return data
 
-    def display_menu(self, panel: str = "status"):
+    def display_menu(self, panel: str = "status", **state):
         data = getattr(self, f"menu_{self.last_key}", self.menu)
         self.display(data, panel, l_offset=75, t_offset=25)
         self.last_key = None
         return data
 
-    def display_status(self, panel: str = "status"):
+    def display_status(self, x_pos, y_pos, z_pos, panel: str = "status", **state):
         panel_w = self.main_w
-        panel_h = 110
+        panel_h = 140
         font = cv2.FONT_HERSHEY_SIMPLEX, .7
 
-        if self.job.status:
+        if self.job.status == 3:
             depthid = f"Job: {self.job.status()}"
             camera = (
                 "Exposure: {ExposureTime:.6f} us ({ExposureTime%:.2%}) "
@@ -186,7 +195,7 @@ class UI:
                 "Format: {PixelFormat}"
             ).format(adj=self.adj_factor, **self.camera.settings)
             motor = (
-                f"Position: {', '.join([str(p) for p in self.controller.position.values()])} "
+                f"Position: {x_pos}, {y_pos}, {z_pos} "
             )
         else:
             depthid = f"FPS: {self.fps:.2f} PipelineT: {self.job.pipeline_t}"
@@ -205,11 +214,11 @@ class UI:
         directory = f"Directory: {self.job.session_directory}"
 
         data = np.zeros((panel_h, panel_w, self.win_channels))
-        cv2.putText(data, motor, (0, 25), *font, self.motor_clr.tolist(), 1)
-        cv2.putText(data, camera, (0, 50), *font, self.camera_clr.tolist(), 1)
-        cv2.putText(data, depthid, (0, 75), *font, self.depthid_clr.tolist(), 1)
-        cv2.putText(data, directory, (0, 100), *font, self.depthid_clr.tolist(), 1)
-        self.display(data, panel, l_offset=15, t_offset=5)
+        cv2.putText(data, motor, (0, 30), *font, self.motor_clr.tolist(), 1)
+        cv2.putText(data, camera, (0, 60), *font, self.camera_clr.tolist(), 1)
+        cv2.putText(data, depthid, (0, 90), *font, self.depthid_clr.tolist(), 1)
+        cv2.putText(data, directory, (0, 120), *font, self.depthid_clr.tolist(), 1)
+        self.display(data, panel, l_offset=15, t_offset=10)
         return data
 
     def menu_loop(self):
@@ -282,7 +291,7 @@ class UI:
             t = self.camera.set("Gain", perc=self.camera.settings['Gain%'] + self.adj_factor)
             logger.info(f"Gain {t} dB ({self.camera.settings['Gain%']:.2%})")
         elif key == "a":
-            self.adj_factor = min(1, max(.01, self.adj_factor - .01))
+            self.adj_factor = min(1.0, max(.01, self.adj_factor - .01))
             logger.info(f"Adjustment factor: {self.adj_factor:.2%}")
         elif key == "a_upper":
             self.adj_factor = max(.01, min(1, self.adj_factor + .01))
@@ -292,9 +301,10 @@ class UI:
         elif key == "f":
             log_dict(self.camera.features, banner="Camera Features")
         elif key == "enter":
-            self.job.save(self.last_main, self.controller.position)
+            self.job.save(self.last_main, use_opencv=True, **self.job.state)
         elif key == "space":
-            self.job.save(self.last_bg, self.controller.position)
+            # todo: generalize this
+            self.job.save(self.last_bg, use_opencv=True, **self.job.state)
 
         # Other control
         if key == "p":

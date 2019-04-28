@@ -12,6 +12,10 @@ logger.setLevel(logging.INFO)
 # todo: test all the camera output formats
 # todo: Test Bayer RG 16
 # todo: make sure jobs still work
+# todo: legend display on find scatterers is relative, nail down for all dimensions
+# todo: CSV export
+# todo: consider autoguiding a la PHD2
+# todo: add safety limits to controller config
 
 
 def main(config_fh: TextIO):

@@ -9,7 +9,7 @@ from depthid import pipeline as p
 from depthid.cameras import Camera, CameraException, OpenCV, Spinnaker, load_camera
 from depthid.controllers import Controller, ControllerException, load_controller
 from depthid.sequence import Sequence
-from depthid.ui.cv import UI as CVUI
+from depthid.ui import UIException, cv
 from depthid.util import pathify, to_csv
 
 
@@ -39,11 +39,11 @@ class Job:
         self.pipeline_t = ""
 
         # todo: consider pushing this out to main
-        self.ui = CVUI(camera=camera, controller=controller, job=self, full_screen=full_screen)
+        self.ui = cv.UI(camera=camera, controller=controller, job=self, full_screen=full_screen)
 
         self.save_ctr = 0
         self.move_ctr = 0
-        self.last_waypoint = None
+        self.state = {}
 
         if csv_filename:
             self.sequence = Sequence.load_csv(csv_filename)
@@ -119,7 +119,24 @@ class Job:
     def do_pipeline(self):
         stack = [None] * len(self.pipeline)
         for idx, step in enumerate(self.pipeline):
+
             start = time()
+
+            # State dict to be made available to all pipeline operations.
+            # A pipeline operation may add any of these keys to its signature to
+            # use current value. All pipeline operations must have a **state arg
+            # in their signature so that non-applicable keys can be ignored.
+            #
+            # The reason for this is not just a local variable is so that the UI
+            # module can inject state, since it calls some pipeline functions
+            # directly.
+
+            self.state = {
+                'x_pos': float(self.controller.position['x']),
+                'y_pos': float(self.controller.position['y']),
+                'z_pos': float(self.controller.position['z']),
+                'pos': self.controller.position
+            }
 
             # User is asked to specify "camera" for i val, which raises TypeError
             # allowing us to inject the dependency
@@ -133,28 +150,41 @@ class Job:
 
             fn = getattr(getattr(p, step['m']), step['f'])
 
+            args = []
             if i is not None:
-                stack[idx] = fn(i, **step.get("kw", {}))
-            else:
-                stack[idx] = fn(**step.get("kw", {}))
+                args = [i]
+
+            try:
+                stack[idx] = fn(*args, **step.get("kw", {}), **self.state)
+            except UIException as e:
+                logger.error(f"UI error during {idx}-{step['m']}-{step['f']}: {e}")
+                raise JobException
+            except Exception:
+                logging.exception(f"Unhandled exception during pipeline exec of {idx}-{step['m']}-{step['f']}")
+                raise
 
             self.pipeline[idx]["time"] = time() - start
+
+            # Special run-time handlers
+            if step['m'] == "pipeline":
+                if step['f'] == "noop" and stack[idx]:
+                    break
+                elif step['f'] == "kill" and stack[idx]:
+                    raise JobException(f"Job killed due to exceeded limit, {self.pos}, limit {step['kw']}")
 
         self.pipeline_t = ", ".join([f"{v['time']:.3f}" for v in self.pipeline])
         return stack
 
-    def save(self, data, formats=None, pos=None):
-        # todo: improve var passing in pipeline so pos can be passed more easily
-        pos = pos if pos is not None else self.last_waypoint
+    def save(self, data, x_pos, y_pos, z_pos, formats=None, use_opencv=False, **kwargs):
 
         for fmt in formats or self.save_formats:
-            fn = f"{self.session_directory}/{self.save_ctr}_{to_csv(pos)}.{fmt}"
+            fn = f"{self.session_directory}/{self.save_ctr}_{x_pos},{y_pos},{z_pos}.{fmt}"
 
             # todo: have this behavior expressed via the camera class
-            if isinstance(self.camera, Spinnaker):
-                p.spinnaker.save(data, fn)
-            elif isinstance(self.camera, OpenCV):
+            if isinstance(self.camera, OpenCV) or use_opencv:
                 p.opencv.save(data, fn)
+            elif isinstance(self.camera, Spinnaker):
+                p.spinnaker.save(data, fn)
 
             self.save_ctr += 1
             logger.info(f"Saved {fn}")
@@ -167,7 +197,6 @@ class Job:
             waypoint = {axis: f"{pos:.3f}" for axis, pos in waypoint if pos not in (None, '')}
 
             self.controller.move(waypoint)
-            self.last_waypoint = waypoint
             self.move_ctr += 1
             self.do_pipeline()
             self.ui.refresh(wait_key=True)
@@ -203,3 +232,7 @@ class Job:
     @property
     def is_interactive(self):
         return self.mode == "interactive"
+
+    @property
+    def pos(self):
+        return self.controller.position
