@@ -142,7 +142,8 @@ class UI:
 
             try:
                 self.job.do_pipeline()
-            except job.JobException:
+            except job.JobException as e:
+                logger.error(e)
                 self.running = False
             else:
                 self.refresh()
