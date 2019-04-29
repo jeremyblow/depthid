@@ -6,7 +6,7 @@ from queue import Empty, Queue
 import cv2
 import numpy as np
 
-from depthid import job
+from depthid import job, blue_rgb, purple_rgb, red_rgb, white_rgb
 from depthid.cameras import CameraException
 from depthid.controllers import ControllerException
 from depthid.pipeline.scikit import convert_uint8_uint16
@@ -100,10 +100,10 @@ class UI:
 
     # BGR
     scale = 65536
-    motor_clr = np.array([0.895, 0.383, 0.00]) * scale
-    camera_clr = np.array([0.894, 0.205, 0.739]) * scale
-    depthid_clr = np.array([0.0, 0.136, .904]) * scale
-    white_clr = np.array([1, 1, 1]) * scale
+    motor_clr = blue_rgb * scale
+    camera_clr = purple_rgb * scale
+    depthid_clr = red_rgb * scale
+    white_clr = white_rgb * scale
 
     def __init__(self, camera, controller, job, full_screen=True):
         self.camera = camera
