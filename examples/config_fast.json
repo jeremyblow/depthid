@@ -1,0 +1,36 @@
+{
+  "controller": {
+    "interface": "grbl",
+    "device_name": "COM3",
+    "baud_rate": 115200,
+    "motors": [
+      ["x", 0.50],
+      ["y", 0.50],
+      ["z", 0.50]
+    ]
+  },
+  "camera": {
+    "interface": "spinnaker",
+    "camera_index": 0,
+    "height": 1200,
+    "width": 1920,
+    "pixel_format": "Mono 16",
+    "exposure_us": 54725.17013549805,
+    "gain_db": 15
+  },
+  "job": {
+    "name": "interactive_session",
+    "path": "~/Desktop/data/",
+    "mode": "interactive",
+    "full_screen": false,
+    "save_formats": ["tiff", "png"],
+    "pipeline": [
+      {"m": "ui", "f": "display_menu", "kw": {"panel": "sub1"}},
+      {"m": "ui", "f": "display_status"},
+      {"m": "spinnaker", "f": "capture", "i": "camera", "kw": {"wait_before":  0.0, "wait_after": 0.0}},
+      {"m": "spinnaker", "f": "transform_ndarray", "i": 2},
+      {"m": "opencv", "f": "gray_to_rgb", "i": 3},
+      {"m": "ui", "f": "display", "i": 4, "kw": {"panel": "main"}}
+    ]
+  }
+}

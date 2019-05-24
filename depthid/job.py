@@ -24,10 +24,11 @@ class Job:
 
     def __init__(self, name: str, path: str, controller: Controller, camera: Camera, pipeline: dict, parameters: str,
                  csv_filename: str = None, sequence_parameters: str = None, coordinates: list = None,
-                 mode: str = "automatic", full_screen: bool = True, save_formats: list = None):
+                 mode: str = "automatic", full_screen: bool = True, save_formats: list = None, description: str = None):
 
         self.start_time = datetime.now()
         self.name = f"{name}_{self.start_time.isoformat().replace(':', '')}"
+        self.description = description
         self.mode = mode
         self.path = pathify(path)
         self.session_directory = f"{self.path}/{self.name}"
@@ -178,7 +179,7 @@ class Job:
     def save(self, data, x_pos, y_pos, z_pos, formats=None, use_opencv=False, **kwargs):
 
         for fmt in formats or self.save_formats:
-            fn = f"{self.session_directory}/{self.save_ctr}_{x_pos},{y_pos},{z_pos}.{fmt}"
+            fn = f"{self.session_directory}/{self.save_ctr:0>5}_{x_pos},{y_pos},{z_pos}.{fmt}"
 
             # todo: have this behavior expressed via the camera class
             if isinstance(self.camera, OpenCV) or use_opencv:

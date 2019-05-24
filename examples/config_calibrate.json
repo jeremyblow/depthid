@@ -36,7 +36,7 @@
       {"m": "ui", "f": "display", "i": 7, "kw": {"panel": "main"}},
       {"m": "pipeline", "f": "noop", "kw": {"x_min": -1}},
       {"m": "opencv", "f": "histogram", "i": 5, "kw": {"bins": 1000}},
-      {"m": "astropy", "f": "find_centroids", "i": 5, "kw": {"sigma": 3.0, "max_iters": 10, "fwhm_range": [2, 20, 3], "threshold": 2.3}},
+      {"m": "astropy", "f": "find_centroids", "i": 5, "kw": {"sigma": 3.0, "max_iters": 1, "fwhm_range": [2], "threshold": 2.3}},
       {"m": "mpl", "f": "plot_histogram_fast", "i": 10, "kw": {"log": "10"}},
       {"m": "ui", "f": "display", "i": 11, "kw": {"panel": "sub2"}},
       {"m": "ui", "f": "display", "i": 12, "kw": {"panel": "sub3"}}

@@ -1,0 +1,30 @@
+{
+  "controller": {
+    "device_name": "COM3",
+    "baud_rate": 115200,
+    "motors": [
+      ["x", 1.00],
+      ["y", 0.50],
+      ["z", 1.00]
+    ]
+  },
+  "camera": {
+    "interface": "spinnaker",
+    "camera_index": 0,
+    "height": 1200,
+    "width": 1920,
+    "pixel_format": "Mono 16",
+    "display_format": "Mono 16",
+    "save_formats": ["raw", "tiff"],
+    "exposure_us": 54725.17013549805,
+    "gain_db": 10
+  },
+  "job": {
+    "name": "z_stack_50x_DF_0to-280z_1step_10db_AOI-1",
+    "path": "data/jeremy/",
+    "mode": "automatic",
+    "wait_before": 0.18,
+    "wait_after": 0.05,
+    "sequence_parameters": "x(0,0,0),y(0,0,0),z(0,-280,-1)"
+  }
+}

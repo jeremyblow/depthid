@@ -14,8 +14,10 @@ class Spinnaker(Camera):
     type_map = {
         'Width': PySpin.CIntegerPtr,
         'Height': PySpin.CIntegerPtr,
+        'ExposureAuto': PySpin.CEnumerationPtr,
         'ExposureTime': PySpin.CFloatPtr,
         'Gain': PySpin.CFloatPtr,
+        'GainAuto': PySpin.CEnumerationPtr,
         'AcquisitionMode': PySpin.CEnumerationPtr,
         'PixelFormat': PySpin.CEnumerationPtr
     }
@@ -41,6 +43,11 @@ class Spinnaker(Camera):
         self.nodemap = self.camera.GetNodeMap()
         self.get_camera_features()
         self.set_enum('AcquisitionMode', 'Continuous')
+        
+        # Camera may default to Auto, which prevents manual setting
+        self.set_enum('ExposureAuto', 'Off')
+        self.set_enum('GainAuto', 'Off')
+        
         self.set("Width", self.width)
         self.set("Height", self.height)
         self.set("ExposureTime", self.exposure_us)

@@ -1,0 +1,70 @@
+{
+  "controller": {
+    "interface": "grbl",
+    "device_name": "COM3",
+    "baud_rate": 115200,
+    "motors": [
+      ["x", 0.50],
+      ["y", 0.50],
+      ["z", 0.50]
+    ]
+  },
+  "camera": {
+    "interface": "spinnaker",
+    "camera_index": 0,
+    "height": 1200,
+    "width": 1920,
+    "pixel_format": "Mono 16",
+    "exposure_us": 4000.0,
+    "gain_db": 10
+  },
+  "job": {
+    "name": "light_frames",
+    "description": "Sample 800 image z-stack, with 20 images for each depth",
+    "path": "~/Desktop/data/jeremy/stacking_experiment",
+    "mode": "automatic",
+    "sequence_parameters": "x(0,0,0),y(0,0,0),z(0,-400,-0.5)",
+    "pipeline": [
+      {"m": "spinnaker", "f": "capture", "i": "camera", "kw": {"wait_before":  0.20, "wait_after": 0.0}},
+      {"m": "job", "f": "save", "i": 0, "kw": {"formats": ["tiff", "raw"]}},
+      {"m": "spinnaker", "f": "capture", "i": "camera", "kw": {"wait_before":  0.0, "wait_after": 0.0}},
+      {"m": "job", "f": "save", "i": 2, "kw": {"formats": ["tiff", "raw"]}},
+      {"m": "spinnaker", "f": "capture", "i": "camera", "kw": {"wait_before":  0.0, "wait_after": 0.0}},
+      {"m": "job", "f": "save", "i": 4, "kw": {"formats": ["tiff", "raw"]}},
+      {"m": "spinnaker", "f": "capture", "i": "camera", "kw": {"wait_before":  0.0, "wait_after": 0.0}},
+      {"m": "job", "f": "save", "i": 6, "kw": {"formats": ["tiff", "raw"]}},
+      {"m": "spinnaker", "f": "capture", "i": "camera", "kw": {"wait_before":  0.0, "wait_after": 0.0}},
+      {"m": "job", "f": "save", "i": 8, "kw": {"formats": ["tiff", "raw"]}},
+      {"m": "spinnaker", "f": "capture", "i": "camera", "kw": {"wait_before":  0.0, "wait_after": 0.0}},
+      {"m": "job", "f": "save", "i": 10, "kw": {"formats": ["tiff", "raw"]}},
+      {"m": "spinnaker", "f": "capture", "i": "camera", "kw": {"wait_before":  0.0, "wait_after": 0.0}},
+      {"m": "job", "f": "save", "i": 12, "kw": {"formats": ["tiff", "raw"]}},
+      {"m": "spinnaker", "f": "capture", "i": "camera", "kw": {"wait_before":  0.0, "wait_after": 0.0}},
+      {"m": "job", "f": "save", "i": 14, "kw": {"formats": ["tiff", "raw"]}},
+      {"m": "spinnaker", "f": "capture", "i": "camera", "kw": {"wait_before":  0.0, "wait_after": 0.0}},
+      {"m": "job", "f": "save", "i": 16, "kw": {"formats": ["tiff", "raw"]}},
+      {"m": "spinnaker", "f": "capture", "i": "camera", "kw": {"wait_before":  0.0, "wait_after": 0.0}},
+      {"m": "job", "f": "save", "i": 18, "kw": {"formats": ["tiff", "raw"]}},
+      {"m": "spinnaker", "f": "capture", "i": "camera", "kw": {"wait_before":  0.0, "wait_after": 0.0}},
+      {"m": "job", "f": "save", "i": 20, "kw": {"formats": ["tiff", "raw"]}},
+      {"m": "spinnaker", "f": "capture", "i": "camera", "kw": {"wait_before":  0.0, "wait_after": 0.0}},
+      {"m": "job", "f": "save", "i": 22, "kw": {"formats": ["tiff", "raw"]}},
+      {"m": "spinnaker", "f": "capture", "i": "camera", "kw": {"wait_before":  0.0, "wait_after": 0.0}},
+      {"m": "job", "f": "save", "i": 24, "kw": {"formats": ["tiff", "raw"]}},
+      {"m": "spinnaker", "f": "capture", "i": "camera", "kw": {"wait_before":  0.0, "wait_after": 0.0}},
+      {"m": "job", "f": "save", "i": 26, "kw": {"formats": ["tiff", "raw"]}},
+      {"m": "spinnaker", "f": "capture", "i": "camera", "kw": {"wait_before":  0.0, "wait_after": 0.0}},
+      {"m": "job", "f": "save", "i": 28, "kw": {"formats": ["tiff", "raw"]}},
+      {"m": "spinnaker", "f": "capture", "i": "camera", "kw": {"wait_before":  0.0, "wait_after": 0.0}},
+      {"m": "job", "f": "save", "i": 30, "kw": {"formats": ["tiff", "raw"]}},
+      {"m": "spinnaker", "f": "capture", "i": "camera", "kw": {"wait_before":  0.0, "wait_after": 0.0}},
+      {"m": "job", "f": "save", "i": 32, "kw": {"formats": ["tiff", "raw"]}},
+      {"m": "spinnaker", "f": "capture", "i": "camera", "kw": {"wait_before":  0.0, "wait_after": 0.0}},
+      {"m": "job", "f": "save", "i": 34, "kw": {"formats": ["tiff", "raw"]}},
+      {"m": "spinnaker", "f": "capture", "i": "camera", "kw": {"wait_before":  0.0, "wait_after": 0.0}},
+      {"m": "job", "f": "save", "i": 36, "kw": {"formats": ["tiff", "raw"]}},
+      {"m": "spinnaker", "f": "capture", "i": "camera", "kw": {"wait_before":  0.0, "wait_after": 0.05}},
+      {"m": "job", "f": "save", "i": 38, "kw": {"formats": ["tiff", "raw"]}}
+    ]
+  }
+}
