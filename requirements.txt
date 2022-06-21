@@ -4,7 +4,7 @@ kiwisolver==1.0.1
 matplotlib==3.0.3
 mkl-fft==1.0.0
 mkl-random==1.0.1
-numpy==1.14.2
+numpy==1.22.0
 opencv-python==3.4.2.17
 py-getch==1.0.1
 pyparsing==2.4.0
